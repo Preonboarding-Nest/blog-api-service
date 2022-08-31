@@ -5,16 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-enum GENDER_ENUM {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-}
-
-enum ROLE_ENUM {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-}
+import { GENDER_ENUM, ROLE_ENUM } from './enums';
 
 @Entity()
 export class User {
@@ -71,13 +62,13 @@ export class User {
   })
   updatedAt: Date;
 
-  // @Column({
-  //   type: 'timestamp',
-  //   name: 'last_accessed_at',
-  //   default: () => 'now()',
-  //   comment: '해당 컬럼은 사용자의 마지막 접속일을 나타냅니다.',
-  // })
-  // lastAccessedAt: Date;
+  @Column({
+    type: 'timestamp',
+    name: 'last_accessed_at',
+    default: () => 'now()',
+    comment: '해당 컬럼은 사용자의 마지막 접속일을 나타냅니다.',
+  })
+  lastAccessedAt: Date;
 
   @Column({
     default: false,
@@ -89,7 +80,7 @@ export class User {
     type: 'enum',
     name: 'role',
     enum: ROLE_ENUM,
-    default: 'USER',
+    default: 'user',
     comment: '해당 컬럼은 사용자의 회원등급을 나타냅니다.',
   })
   role: ROLE_ENUM;
