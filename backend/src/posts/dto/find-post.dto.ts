@@ -1,20 +1,19 @@
+import { Post } from '../entities/post.entity';
+
 export class FindPostResponseDto {
-  constructor(
-    id: number,
-    title: string,
-    content: string,
-    createdAt: Date,
-    updatedAt: Date,
-  ) {
-    this.id = id;
-    this.title = title;
-    this.content = content;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
-  }
   id: number;
   title: string;
   content: string;
   createdAt: Date;
   updatedAt: Date;
+
+  of(post: Post) {
+    this.id = post.id;
+    this.title = post.title;
+    this.content = post.content;
+    this.createdAt = post.createdAt;
+    this.updatedAt = post.updatedAt;
+
+    return this;
+  }
 }

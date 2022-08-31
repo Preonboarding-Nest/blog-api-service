@@ -24,16 +24,7 @@ export class PostsService {
     const posts: Post[] = await this.postRepository.find();
     return posts
       .filter((p) => p.isDeleted === false)
-      .map(
-        (p) =>
-          new FindPostResponseDto(
-            p.id,
-            p.title,
-            p.content,
-            p.createdAt,
-            p.updatedAt,
-          ),
-      );
+      .map((p) => new FindPostResponseDto().of(p));
   }
 
   async findOne(id: number): Promise<FindPostResponseDto> {
@@ -42,13 +33,7 @@ export class PostsService {
     if (!post || post.isDeleted) {
       throw new NotFoundException(`post not found, id = ${id}`);
     }
-    return new FindPostResponseDto(
-      post.id,
-      post.title,
-      post.content,
-      post.createdAt,
-      post.updatedAt,
-    );
+    return new FindPostResponseDto().of(post);
   }
 
   async update(id: number, updatePostDto: UpdatePostDto): Promise<void> {
