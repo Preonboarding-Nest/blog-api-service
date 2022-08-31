@@ -16,7 +16,7 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { email, password } = createUserDto;
     const existingUser = await this.userRepository.findOne({
       where: { email },
@@ -36,7 +36,7 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  async findUserById(id: number) {
+  async findUserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
@@ -46,7 +46,7 @@ export class UsersService {
     return user;
   }
 
-  async removeUserById(id: number) {
+  async removeUserById(id: number): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('User not found.');
