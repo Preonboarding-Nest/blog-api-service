@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -34,8 +34,19 @@ export class PostsService {
     );
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(id: number): Promise<FindPostResponseDto> {
+    // Todo 사용자 모델이 개발되면 사용자 정보도 응답해주도록 변경 예정
+    const post: Post = await this.postRepository.findOneBy({ id });
+    if (!post) {
+      throw new NotFoundException(`post not found, id = ${id}`);
+    }
+    return new FindPostResponseDto(
+      post.id,
+      post.title,
+      post.content,
+      post.createdAt,
+      post.updatedAt,
+    );
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {
