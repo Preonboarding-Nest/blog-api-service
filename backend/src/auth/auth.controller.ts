@@ -1,18 +1,18 @@
 import { Controller, Get, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor() {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Post('signin')
-  async create() {}
+  @Post('login')
+  async login() {
+    await this.authService.login();
+  }
 
   @Post('logout')
   async logout() {}
 
   @Get('token')
   async token() {}
-}
-function ApiTags(arg0: string) {
-  throw new Error('Function not implemented.');
 }
