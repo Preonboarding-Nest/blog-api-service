@@ -8,6 +8,8 @@ import { DatabaseModule } from './database/database.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
+      envFilePath:
+        process.env.NODE_ENV === 'production' ? '.env' : 'development.env',
       validationSchema: Joi.object({
         PORT: Joi.number(),
         DB_HOST: Joi.string().required(),
