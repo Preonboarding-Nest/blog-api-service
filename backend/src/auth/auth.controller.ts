@@ -1,16 +1,47 @@
-import { Body, Controller, Get, Logger, Post } from '@nestjs/common';
-import { User } from 'src/users/entities/user.entity';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Logger,
+  Post,
+  Res
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(`AuthController`);
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
+  @HttpCode(201)
   @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    const user: User = await this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { user, tokens } = await this.authService.login(loginDto);
+
+    try {
+      res.cookie('AccessToken', tokens.accessToken, {
+        maxAge: this.configService.get('JWT_EXPIRESIN'),
+        httpOnly: true,
+        // secure:true,
+      });
+
+      res.cookie('RefreshToken', tokens.refreshToken, {
+        maxAge: this.configService.get('JWT_REFRESH_EXPIRESIN'),
+        httpOnly: true,
+        // secure:true,
+      });
+    } catch (error) {}
+
     this.logger.verbose(`login success!`);
     return {
       user: {

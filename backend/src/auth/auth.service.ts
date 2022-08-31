@@ -32,7 +32,7 @@ export class AuthService {
     }
   }
 
-  async login(loginDto: LoginDto): Promise<User> {
+  async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
     const user: User = await this.findUserByEmail(email);
     if (!user) throw new ForbiddenException('회원이 존재하지 않습니다.');
@@ -44,7 +44,7 @@ export class AuthService {
     const tokens: Tokens = await this.makeTokens(email, user.id);
     // redis에 저장
 
-    return user;
+    return { user, tokens };
   }
 
   async makeTokens(email: string, id: number): Promise<Tokens> {

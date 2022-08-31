@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -21,6 +22,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, docsConfig);
 
   SwaggerModule.setup(`${prefix}/docs`, app, document);
+
+  app.use(cookieParser());
 
   await app.listen(PORT, () => {
     console.log(`server run on http://localhost:${PORT}${prefix}`);
