@@ -51,8 +51,16 @@ export class PostsService {
     );
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: number, updatePostDto: UpdatePostDto): Promise<void> {
+    const post: Post = await this.postRepository.findOneBy({ id });
+    if (!post || post.isDeleted) {
+      throw new NotFoundException(`post not found, id = ${id}`);
+    }
+    // 기존 게시글의 내용을 모두 전송한다고 가정하고 구현
+    await this.postRepository.update(id, {
+      title: updatePostDto.title,
+      content: updatePostDto.content,
+    });
   }
 
   async remove(id: number): Promise<void> {

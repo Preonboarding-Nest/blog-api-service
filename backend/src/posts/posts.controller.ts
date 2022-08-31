@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -27,17 +28,22 @@ export class PostsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<FindPostResponseDto> {
-    return await this.postsService.findOne(+id);
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<FindPostResponseDto> {
+    return await this.postsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<void> {
+    await this.postsService.update(id, updatePostDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    return await this.postsService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return await this.postsService.remove(id);
   }
 }
