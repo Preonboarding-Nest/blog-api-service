@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -21,18 +22,13 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: '유저 생성 API', description: '유저를 생성합니다.' })
   @ApiCreatedResponse({ description: '유저를 생성합니다.', type: User })
-  create(@Body() createUserDto: CreateUserDto) {
+  createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findOneUser(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findUserById(id);
   }
 
   @Patch(':id')
