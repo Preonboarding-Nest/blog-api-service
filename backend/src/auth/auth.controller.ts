@@ -11,8 +11,12 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout() {}
+  async logout() {
+    await this.authService.logout();
+  }
 
   @Get('token')
-  async token() {}
+  async token() {
+    await this.authService.token();
+  }
 }
