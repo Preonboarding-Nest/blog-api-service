@@ -21,17 +21,21 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: '유저 생성 API', description: '유저를 생성합니다.' })
   @ApiCreatedResponse({ description: '유저를 생성합니다.', type: User })
-  createUser(@Body() createUserDto: CreateUserDto) {
+  createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }
 
   @Get(':id')
-  findOneUser(@Param('id', ParseIntPipe) id: number) {
+  @ApiOperation({ summary: '유저 조회 API', description: '유저를 조회합니다.' })
+  @ApiCreatedResponse({ description: '유저를 조회합니다.', type: User })
+  findOneUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.usersService.findUserById(id);
   }
 
   @Delete(':id')
-  removeUserById(@Param('id', ParseIntPipe) id: number) {
+  @ApiOperation({ summary: '유저 삭제 API', description: '유저를 삭제합니다.' })
+  @ApiCreatedResponse({ description: '유저를 삭제합니다.', type: null })
+  removeUserById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.usersService.removeUserById(id);
   }
 }
