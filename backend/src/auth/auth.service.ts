@@ -1,14 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/users/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { User } from '../users/entities/user.entity';
+import { LoginDto } from './dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
 
-  async login() {}
+  async login(loginDto: LoginDto) {
+    const { email, password } = loginDto;
+    return 'login!';
+  }
 
-  async logout() {}
+  async logout() {
+    // logout
+    return 'logout!';
+  }
 
-  async token() {}
+  async token() {
+    // token
+    return 'token!';
+  }
 }
