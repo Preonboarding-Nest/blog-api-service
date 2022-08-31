@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { LoginDto } from './dto';
+import { JwtPayload, Tokens } from './types';
 
 @Injectable()
 export class AuthService {
@@ -40,29 +41,25 @@ export class AuthService {
     if (!isPwMatching)
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
-    await this.makeTokens(email, user.id);
+    const tokens: Tokens = await this.makeTokens(email, user.id);
     // redis에 저장
 
     return user;
   }
 
-  async makeTokens(email: string, id: number) {
+  async makeTokens(email: string, id: number): Promise<Tokens> {
     try {
-      const accessToken: string = await this.jwtService.signAsync(
-        { email, sub: id },
-        {
-          secret: this.configService.get('JWT_SECRET'),
-          expiresIn: this.configService.get('JWT_EXPIRESIN'),
-        },
-      );
+      const jwtPayload: JwtPayload = { email, sub: id };
 
-      const refreshToken: string = await this.jwtService.signAsync(
-        { email, sub: id },
-        {
-          secret: this.configService.get('JWT_REFRESH_SECRET'),
-          expiresIn: this.configService.get('JWT_REFRESH_EXPIRESIN'),
-        },
-      );
+      const accessToken: string = await this.jwtService.signAsync(jwtPayload, {
+        secret: this.configService.get('JWT_SECRET'),
+        expiresIn: this.configService.get('JWT_EXPIRESIN'),
+      });
+
+      const refreshToken: string = await this.jwtService.signAsync(jwtPayload, {
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
+        expiresIn: this.configService.get('JWT_REFRESH_EXPIRESIN'),
+      });
 
       return { accessToken, refreshToken };
     } catch (error) {
@@ -75,7 +72,7 @@ export class AuthService {
     return 'logout!';
   }
 
-  async token() {
+  token() {
     // token
     return 'token!';
   }
