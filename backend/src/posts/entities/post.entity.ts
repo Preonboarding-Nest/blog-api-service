@@ -8,6 +8,10 @@ import {
 
 @Entity()
 export class Post {
+  constructor(title: string, content: string) {
+    this.title = title;
+    this.content = content;
+  }
   @PrimaryGeneratedColumn()
   id: number;
 
