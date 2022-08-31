@@ -3,6 +3,7 @@ import {
   NotFoundException,
   UnauthorizedException
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -13,10 +14,18 @@ import { LoginDto } from './dto';
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async findUserByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { email } });
+    try {
+      const user: User = await this.userRepository.findOne({
+        where: { email },
+      });
+      return user;
+    } catch (error) {
+      throw new NotFoundException('회원 정보를 조회하지 못했습니다.');
+    }
   }
 
   async login(loginDto: LoginDto): Promise<User> {
@@ -28,14 +37,13 @@ export class AuthService {
     if (!isPwMatching)
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
-    // 토큰 발급
-    await this.makeTokens();
+    await this.makeTokens(email, user.id);
     // redis에 저장
 
     return user;
   }
 
-  async makeTokens() {}
+  async makeTokens(email: string, id: number) {}
 
   async logout() {
     // logout
