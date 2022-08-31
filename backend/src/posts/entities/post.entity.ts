@@ -11,15 +11,36 @@ export class Post {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    type: 'varchar',
+    length: 50,
+    comment: '해당 컬럼은 게시글의 제목을 나타냅니다.',
+  })
   title: string;
 
-  @Column()
+  @Column({
+    type: 'text',
+    comment: '해당 컬럼은 게시글의 내용을 나타냅니다.',
+  })
   content: string;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  @CreateDateColumn({
+    type: 'timestamp',
+    name: 'created_at',
+    comment: '해당 컬럼은 게시글의 등록일을 나타냅니다.',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+  @UpdateDateColumn({
+    type: 'timestamp',
+    name: 'updated_at',
+    comment: '해당 컬럼은 게시글의 수정일을 나타냅니다.',
+  })
   updatedAt: Date;
+
+  @Column({
+    default: false,
+    comment: '해당 컬럼은 게시글이 삭제되었는지 여부를 나타냅니다.',
+  })
+  isDeleted: boolean;
 }
