@@ -55,9 +55,9 @@ export class PostsService {
 
   async remove(id: number): Promise<void> {
     const post = await this.postRepository.findOneBy({ id });
-    if (!post || post.isDeleted === false) {
+    if (!post || post.isDeleted) {
       throw new NotFoundException(`post not found, id = ${id}`);
     }
-    post.isDeleted = true;
+    await this.postRepository.update(id, { isDeleted: true });
   }
 }
