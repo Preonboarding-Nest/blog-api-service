@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
+import { StatisticsInterceptor } from './interceptors/statistics.interceptor';
+import { StatisticsModule } from './statistics/statistics.module';
 
 @Module({
   imports: [
@@ -19,9 +23,17 @@ import { DatabaseModule } from './database/database.module';
         DB_NAME: Joi.string().required(),
       }),
     }),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
+    StatisticsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: StatisticsInterceptor,
+    },
+    AppService,
+  ],
 })
 export class AppModule {}
