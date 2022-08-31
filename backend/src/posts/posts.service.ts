@@ -39,7 +39,7 @@ export class PostsService {
   async findOne(id: number): Promise<FindPostResponseDto> {
     // Todo 사용자 모델이 개발되면 사용자 정보도 응답해주도록 변경 예정
     const post: Post = await this.postRepository.findOneBy({ id });
-    if (!post) {
+    if (!post || post.isDeleted) {
       throw new NotFoundException(`post not found, id = ${id}`);
     }
     return new FindPostResponseDto(
