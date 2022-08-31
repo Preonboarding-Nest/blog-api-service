@@ -65,6 +65,7 @@ export class User {
   @Column({
     type: 'timestamp',
     name: 'last_accessed_at',
+    default: () => 'now()',
     comment: '해당 컬럼은 사용자의 마지막 접속일을 나타냅니다.',
   })
   lastAccessedAt: Date;
