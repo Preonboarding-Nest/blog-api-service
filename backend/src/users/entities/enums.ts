@@ -1,9 +1,9 @@
-export enum Gender {
-  MALE = 'male',
-  FEMALE = 'female',
+export enum GENDER_ENUM {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
 }
 
-export enum Role {
-  ADMIN = 'admin',
-  USER = 'user',
+export enum ROLE_ENUM {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
 }
