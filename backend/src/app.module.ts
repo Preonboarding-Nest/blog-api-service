@@ -7,7 +7,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
-import { StatisticsInterceptor } from './interceptors/statistics.interceptor';
 import { StatisticsModule } from './statistics/statistics.module';
 import { AllExceptionsFilter } from './filters/all-exception.filter';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
