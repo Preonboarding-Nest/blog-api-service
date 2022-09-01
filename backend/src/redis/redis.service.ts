@@ -18,4 +18,13 @@ export class RedisService {
       throw new ForbiddenException('cache access failed!');
     }
   }
+
+  async delKey(key: string): Promise<boolean> {
+    try {
+      await this.cacheManager.del(key);
+      return true;
+    } catch (error) {
+      throw new ForbiddenException('cache access failed!');
+    }
+  }
 }

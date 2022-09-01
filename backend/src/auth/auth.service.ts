@@ -74,8 +74,9 @@ export class AuthService {
     }
   }
 
-  async logout() {
-    return 'logout!';
+  async logout(id: number): Promise<boolean> {
+    await this.redisService.delKey('refresh' + id.toString());
+    return true;
   }
 
   token() {

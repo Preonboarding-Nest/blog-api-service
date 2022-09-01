@@ -74,15 +74,25 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(AuthGuard('jwt'))
-  async logout(@GetCurrentUserId() id: number) {
-    console.log(id);
-    // redis에서 삭제
-    // cookie 삭제
+  async logout(
+    @GetCurrentUserId() id: number,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.authService.logout(id);
+
+    try {
+      res.clearCookie('AccessToken');
+      res.clearCookie('RefreshToken');
+
+      this.logger.verbose(`logout success!`);
+    } catch (error) {
+      throw new ForbiddenException('cookie access Failed!');
+    }
   }
 
   @Get('token')
   @UseGuards(AuthGuard('refresh'))
-  async token() {
+  async token(@GetCurrentUserId() id: number) {
     // accesstoken 새로 발급
     await this.authService.token();
     // accesstoken cookie 삽입
