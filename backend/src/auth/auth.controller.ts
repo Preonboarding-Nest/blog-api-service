@@ -60,6 +60,7 @@ export class AuthController {
       res.cookie('RefreshToken', tokens.refreshToken, {
         maxAge: this.configService.get('JWT_REFRESH_EXPIRESIN'),
         httpOnly: true,
+        secure: true,
       });
     } catch (error) {
       throw new ForbiddenException('cookie access Failed!');
@@ -108,9 +109,18 @@ export class AuthController {
 
   @Get('token')
   @UseGuards(AuthGuard('refresh'))
-  async token(@GetCurrentUserId() id: number) {
-    // accesstoken 새로 발급
-    await this.authService.token();
-    // accesstoken cookie 삽입
+  async token(
+    @GetCurrentUserId() id: number,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const accessToken: string = await this.authService.token(id);
+    try {
+      res.cookie('AccessToken', accessToken, {
+        maxAge: this.configService.get('JWT_EXPIRESIN'),
+        httpOnly: true,
+      });
+    } catch (error) {
+      throw new ForbiddenException('cookie access Failed!');
+    }
   }
 }

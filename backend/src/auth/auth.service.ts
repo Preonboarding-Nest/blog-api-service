@@ -34,6 +34,17 @@ export class AuthService {
     }
   }
 
+  async findUserById(id: number): Promise<User> {
+    try {
+      const user: User = await this.userRepository.findOne({
+        where: { id },
+      });
+      return user;
+    } catch (error) {
+      throw new NotFoundException('회원 정보를 조회하지 못했습니다.');
+    }
+  }
+
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
     const user: User = await this.findUserByEmail(email);
@@ -79,7 +90,25 @@ export class AuthService {
     return true;
   }
 
-  token() {
-    return 'token!';
+  async token(id: number): Promise<string> {
+    const refreshToken: string = await this.redisService.getKey(
+      'refresh' + id.toString(),
+    );
+    try {
+      if (!refreshToken)
+        throw new UnauthorizedException('토큰을 가진 회원이 아닙니다.');
+
+      const user: User = await this.findUserById(id);
+      const jwtPayload: JwtPayload = { email: user.email, sub: id };
+
+      const accessToken: string = await this.jwtService.signAsync(jwtPayload, {
+        secret: this.configService.get('JWT_SECRET'),
+        expiresIn: this.configService.get('JWT_EXPIRESIN'),
+      });
+
+      return accessToken;
+    } catch (error) {
+      throw new UnauthorizedException('토큰을 생성하지 못했습니다.');
+    }
   }
 }

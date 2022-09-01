@@ -27,4 +27,13 @@ export class RedisService {
       throw new ForbiddenException('cache access failed!');
     }
   }
+
+  async getKey(key: string): Promise<string> {
+    try {
+      const value: string = (await this.cacheManager.get(key)) as string;
+      return value;
+    } catch (error) {
+      throw new ForbiddenException('cache access failed!');
+    }
+  }
 }
