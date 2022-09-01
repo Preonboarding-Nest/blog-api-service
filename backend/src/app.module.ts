@@ -12,7 +12,6 @@ import { AllExceptionsFilter } from './filters/all-exception.filter';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { PostsModule } from './posts/posts.module';
 import { RedisModule } from './redis/redis.module';
-
 import { UsersModule } from './users/users.module';
 
 @Module({
