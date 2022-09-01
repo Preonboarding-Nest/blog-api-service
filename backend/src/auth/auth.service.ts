@@ -93,10 +93,11 @@ export class AuthService {
     const refreshToken: string = await this.redisService.getKey(
       'refresh' + id.toString(),
     );
-    try {
-      if (!refreshToken)
-        throw new UnauthorizedException('토큰을 가진 회원이 아닙니다.');
 
+    if (!refreshToken)
+      throw new UnauthorizedException('토큰을 가진 회원이 아닙니다.');
+
+    try {
       const user: User = await this.findUserById(id);
       const jwtPayload: JwtPayload = { email: user.email, sub: id };
 
