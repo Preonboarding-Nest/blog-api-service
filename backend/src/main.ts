@@ -17,6 +17,24 @@ async function bootstrap() {
     .setTitle('waynehills subject')
     .setDescription('웨인힐즈 과제')
     .setVersion('1.0')
+    .addCookieAuth(
+      'auth-cookie',
+      {
+        type: 'http',
+        in: 'Header',
+        scheme: 'Bearer',
+      },
+      'accessToken',
+    )
+    .addCookieAuth(
+      'auth-cookie',
+      {
+        type: 'http',
+        in: 'Header',
+        scheme: 'Bearer',
+      },
+      'refreshToken',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, docsConfig);

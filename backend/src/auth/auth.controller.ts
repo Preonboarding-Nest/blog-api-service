@@ -11,7 +11,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCookieAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import { GetCurrentUserId } from '../commons/decorators';
 import { AuthService } from './auth.service';
@@ -74,6 +80,16 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({
+    summary: '유저 로그아웃 API',
+    description: '유저의 accessToken, refreshToken를 삭제한다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '로그아웃 성공',
+  })
+  @ApiCookieAuth('refreshToken')
+  @ApiCookieAuth('accessToken')
   async logout(
     @GetCurrentUserId() id: number,
     @Res({ passthrough: true }) res: Response,
