@@ -6,11 +6,14 @@ import {
   HttpCode,
   Logger,
   Post,
-  Res
+  Res,
+  UseGuards
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { GetCurrentUserId } from '../commons/decorators';
 import { AuthService } from './auth.service';
 import { LoginDto, LoginResponseDto } from './dto';
 
@@ -70,12 +73,18 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout() {
-    await this.authService.logout();
+  @UseGuards(AuthGuard('jwt'))
+  async logout(@GetCurrentUserId() id: number) {
+    console.log(id);
+    // redis에서 삭제
+    // cookie 삭제
   }
 
   @Get('token')
+  @UseGuards(AuthGuard('refresh'))
   async token() {
+    // accesstoken 새로 발급
     await this.authService.token();
+    // accesstoken cookie 삽입
   }
 }
