@@ -1,8 +1,7 @@
 import {
-  CACHE_MANAGER,
-  ForbiddenException,
-  Inject,
-  Injectable
+  CACHE_MANAGER, Inject,
+  Injectable,
+  NotFoundException
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
@@ -15,7 +14,7 @@ export class RedisService {
       await this.cacheManager.set(key, value, { ttl });
       return true;
     } catch (error) {
-      throw new ForbiddenException('cache access failed!');
+      throw new NotFoundException('cache access failed!');
     }
   }
 
@@ -24,7 +23,7 @@ export class RedisService {
       await this.cacheManager.del(key);
       return true;
     } catch (error) {
-      throw new ForbiddenException('cache access failed!');
+      throw new NotFoundException('cache access failed!');
     }
   }
 
@@ -33,7 +32,7 @@ export class RedisService {
       const value: string = (await this.cacheManager.get(key)) as string;
       return value;
     } catch (error) {
-      throw new ForbiddenException('cache access failed!');
+      throw new NotFoundException('cache access failed!');
     }
   }
 }
