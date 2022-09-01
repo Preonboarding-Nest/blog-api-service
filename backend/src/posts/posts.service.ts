@@ -6,6 +6,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { FindPostResponseDto } from './dto/find-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
+import { PostCategory } from './entities/post-category.entity';
 
 @Injectable()
 export class PostsService {
@@ -14,11 +15,22 @@ export class PostsService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(PostCategory)
+    private readonly postCategoryRepository: Repository<PostCategory>,
   ) {}
 
   async create(createPostDto: CreatePostDto): Promise<number> {
     // Todo 게시글 종류 모델이 개발되면 연관관게 설정 후 저장하도록 변경 예정
     // Todo 생성자를 toEntity()를 사용하면 좋을 듯 하다.
+    const postCategory = this.postCategoryRepository.findOneBy({
+      id: createPostDto.categoryId,
+    });
+    if (!postCategory) {
+      throw new NotFoundException(
+        `postCategory not found, id = ${createPostDto.categoryId}`,
+      );
+    }
+
     const post = new Post(createPostDto.title, createPostDto.content);
     // 임시로 2번 회원으로 설정하여 저장
     post.user = await this.userRepository.findOneBy({ id: 2 });
