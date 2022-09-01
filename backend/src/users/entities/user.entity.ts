@@ -1,7 +1,9 @@
+import { Post } from '../../posts/entities/post.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -84,4 +86,7 @@ export class User {
     comment: '해당 컬럼은 사용자의 회원등급을 나타냅니다.',
   })
   role: ROLE_ENUM;
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 }

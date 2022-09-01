@@ -1,9 +1,11 @@
+import { User } from '../../users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
@@ -47,4 +49,7 @@ export class Post {
     comment: '해당 컬럼은 게시글이 삭제되었는지 여부를 나타냅니다.',
   })
   isDeleted: boolean;
+
+  @ManyToOne(() => User, (user) => user.posts)
+  user: User;
 }
