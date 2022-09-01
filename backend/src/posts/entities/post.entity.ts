@@ -11,10 +11,6 @@ import { PostCategory } from './post-category.entity';
 
 @Entity()
 export class Post {
-  constructor(title: string, content: string) {
-    this.title = title;
-    this.content = content;
-  }
   @PrimaryGeneratedColumn()
   id: number;
 
