@@ -5,12 +5,9 @@ import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
-<<<<<<< HEAD
 import { AllExceptionsFilter } from './filters/all-exception.filter';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
-=======
 import { UsersModule } from './users/users.module';
->>>>>>> dbdd79791c57ecb3e12af7622d2bcd739cf45529
 
 @Module({
   imports: [
