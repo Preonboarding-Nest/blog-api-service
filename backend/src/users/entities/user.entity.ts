@@ -1,3 +1,4 @@
+import { Statistic } from '../../statistics/entities/statistic.entity';
 import { Post } from '../../posts/entities/post.entity';
 import {
   Column,
@@ -86,6 +87,9 @@ export class User {
     comment: '해당 컬럼은 사용자의 회원등급을 나타냅니다.',
   })
   role: ROLE_ENUM;
+
+  @OneToMany(() => Statistic, (statistic) => statistic.user)
+  statistics: Statistic[];
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
