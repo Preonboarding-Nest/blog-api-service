@@ -6,10 +6,10 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 
@@ -21,27 +21,21 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: '유저 생성 API', description: '유저를 생성합니다.' })
   @ApiCreatedResponse({ description: '유저를 생성합니다.', type: User })
-  create(@Body() createUserDto: CreateUserDto) {
+  createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @ApiOperation({ summary: '유저 조회 API', description: '유저를 조회합니다.' })
+  @ApiCreatedResponse({ description: '유저를 조회합니다.', type: User })
+  findOneUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.usersService.findUserById(id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @ApiOperation({ summary: '유저 삭제 API', description: '유저를 삭제합니다.' })
+  @ApiCreatedResponse({ description: '유저를 삭제합니다.', type: null })
+  removeUserById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.usersService.removeUserById(id);
   }
 }

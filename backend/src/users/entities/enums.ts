@@ -1,9 +1,9 @@
 export enum GENDER_ENUM {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
+  MALE = 'male',
+  FEMALE = 'female',
 }
 
 export enum ROLE_ENUM {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
+  ADMIN = 'admin',
+  USER = 'user',
 }

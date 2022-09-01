@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { GENDER_ENUM, ROLE_ENUM } from '../entities/enums';
+import { GENDER_ENUM, ROLE_ENUM } from './enums';
 
 @Entity()
 export class User {
@@ -22,7 +22,7 @@ export class User {
 
   @Column({
     type: 'varchar',
-    length: 20,
+    length: 100,
     comment: '해당 컬럼은 사용자의 패스워드를 나타냅니다.',
   })
   password: string;
@@ -80,7 +80,7 @@ export class User {
     type: 'enum',
     name: 'role',
     enum: ROLE_ENUM,
-    default: ROLE_ENUM.USER,
+    default: 'user',
     comment: '해당 컬럼은 사용자의 회원등급을 나타냅니다.',
   })
   role: ROLE_ENUM;
