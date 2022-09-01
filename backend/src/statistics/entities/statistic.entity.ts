@@ -3,8 +3,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Statistic {
@@ -32,4 +34,7 @@ export class Statistic {
     comment: '해당 컬럼은 요청 시간을 나타냅니다.',
   })
   timestamp: Date;
+
+  @ManyToOne(() => User, (user) => user.statistics)
+  user: User;
 }
