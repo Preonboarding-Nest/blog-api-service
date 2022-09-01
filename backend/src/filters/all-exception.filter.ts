@@ -24,14 +24,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const httpException: HttpException = exception as HttpException;
-
-    const response: string | object = httpException.getResponse();
-
     const responseBody: Response<void> = {
       status: 'error',
-      message: typeof response === 'string' ? response : response['message'],
     };
+
+    if (exception instanceof HttpException) {
+      const httpException = exception as HttpException;
+
+      const response: string | object = httpException.getResponse();
+
+      responseBody.message =
+        typeof response === 'string' ? response : response['message'];
+    }
+
+    if (exception instanceof Error) {
+      const error = exception as Error;
+
+      responseBody.message = error.message;
+    }
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
