@@ -25,11 +25,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const httpException: HttpException = exception as HttpException;
-    const response: object = httpException.getResponse() as object;
+
+    const response: string | object = httpException.getResponse();
 
     const responseBody: Response<void> = {
       status: 'error',
-      message: response['message'],
+      message: typeof response === 'string' ? response : response['message'],
     };
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
