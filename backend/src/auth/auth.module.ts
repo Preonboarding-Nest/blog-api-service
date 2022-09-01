@@ -8,6 +8,7 @@ import { User } from '../users/entities/user.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategy';
+import { JwtRefreshStrategy } from './strategy/jwt.refresh.strategy';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { JwtStrategy } from './strategy';
     }),
     RedisModule,
   ],
-  providers: [AuthService, JwtStrategy, ConfigService],
+  providers: [AuthService, JwtStrategy, JwtRefreshStrategy, ConfigService],
   controllers: [AuthController],
   exports: [AuthService, RedisModule],
 })
