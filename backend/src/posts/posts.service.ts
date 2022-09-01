@@ -18,6 +18,7 @@ export class PostsService {
 
   async create(createPostDto: CreatePostDto): Promise<number> {
     // Todo 게시글 종류 모델이 개발되면 연관관게 설정 후 저장하도록 변경 예정
+    // Todo 생성자를 toEntity()를 사용하면 좋을 듯 하다.
     const post = new Post(createPostDto.title, createPostDto.content);
     // 임시로 2번 회원으로 설정하여 저장
     post.user = await this.userRepository.findOneBy({ id: 2 });
@@ -31,9 +32,7 @@ export class PostsService {
     });
     return posts
       .filter((p) => p.isDeleted === false)
-      .map((p) => {
-        return new FindPostResponseDto().of(p);
-      });
+      .map((p) => new FindPostResponseDto().of(p));
   }
 
   async findOne(id: number): Promise<FindPostResponseDto> {
@@ -48,15 +47,13 @@ export class PostsService {
   }
 
   async update(id: number, updatePostDto: UpdatePostDto): Promise<void> {
+    const { title, content } = updatePostDto;
     const post: Post = await this.postRepository.findOneBy({ id });
     if (!post || post.isDeleted) {
       throw new NotFoundException(`post not found, id = ${id}`);
     }
     // 기존 게시글의 내용을 모두 전송한다고 가정하고 구현
-    await this.postRepository.update(id, {
-      title: updatePostDto.title,
-      content: updatePostDto.content,
-    });
+    await this.postRepository.update(id, { title, content });
   }
 
   async remove(id: number): Promise<void> {
