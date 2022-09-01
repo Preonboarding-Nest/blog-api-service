@@ -8,12 +8,20 @@ import {
   Delete,
   ParseIntPipe,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { FindPostResponseDto } from './dto/find-post.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { GetCurrentUserId } from '../commons/decorators';
 
 @Controller('posts')
 @ApiTags('Posts API')
@@ -25,9 +33,15 @@ export class PostsController {
     status: HttpStatus.CREATED,
     description: '게시글 등록 성공',
   })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiCookieAuth('refreshToken')
+  @ApiCookieAuth('accessToken')
   @Post()
-  create(@Body() createPostDto: CreatePostDto): Promise<number> {
-    return this.postsService.create(createPostDto);
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @GetCurrentUserId() userId: number,
+  ): Promise<number> {
+    return this.postsService.create(createPostDto, userId);
   }
 
   @ApiOperation({ summary: '게시글 목록 조회 API' })

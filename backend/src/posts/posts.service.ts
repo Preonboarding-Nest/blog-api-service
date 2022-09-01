@@ -19,7 +19,7 @@ export class PostsService {
     private readonly postCategoryRepository: Repository<PostCategory>,
   ) {}
 
-  async create(createPostDto: CreatePostDto): Promise<number> {
+  async create(createPostDto: CreatePostDto, userId: number): Promise<number> {
     const categoryId = createPostDto.categoryId;
     const postCategory = await this.postCategoryRepository.findOneBy({
       id: categoryId,
@@ -33,8 +33,11 @@ export class PostsService {
     post.content = createPostDto.content;
     post.postCategory = postCategory;
 
-    // 임시로 2번 회원으로 설정하여 저장
-    post.user = await this.userRepository.findOneBy({ id: 2 });
+    post.user = await this.userRepository.findOneBy({ id: userId });
+
+    if (!post.user || post.user.isDeleted) {
+      throw new NotFoundException('user not found');
+    }
     const savedPost = await this.postRepository.save(post);
     return savedPost.id;
   }
