@@ -27,6 +27,10 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
   controllers: [AppController],
   providers: [
     {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+    {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
