@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -61,5 +62,14 @@ export class PostsCategoryController {
       id,
       updatePostCategoryDto,
     );
+  }
+
+  @ApiOperation({ summary: '게시글 종류 삭제 API' })
+  @ApiOkResponse({
+    description: '게시글 종류 삭제 성공',
+  })
+  @Delete('/:id')
+  deletePostCategory(@Param('id', ParseIntPipe) id: number): void {
+    this.postsCategoryService.deletePostCategory(id);
   }
 }

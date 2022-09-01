@@ -54,4 +54,16 @@ export class PostsCategoryService {
 
     return await this.postCategoryRepository.save(postCategory);
   }
+
+  async deletePostCategory(id: number): Promise<void> {
+    const postCategory = await this.postCategoryRepository.findOne({
+      where: { id },
+    });
+
+    if (!postCategory) {
+      throw new NotFoundException('Post category not found.');
+    }
+
+    await this.postCategoryRepository.remove(postCategory);
+  }
 }
