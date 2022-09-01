@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { StatisticsInterceptor } from './interceptors/statistics.interceptor';
 import { StatisticsModule } from './statistics/statistics.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { StatisticsModule } from './statistics/statistics.module';
     EventEmitterModule.forRoot(),
     DatabaseModule,
     StatisticsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [
