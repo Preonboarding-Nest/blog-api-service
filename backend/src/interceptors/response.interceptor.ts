@@ -13,10 +13,8 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<Response<T>> {
-    console.log('test');
     return next.handle().pipe(
       map((data) => {
-        console.log(data);
         if (!data.message) {
           return {
             status: 'success',
