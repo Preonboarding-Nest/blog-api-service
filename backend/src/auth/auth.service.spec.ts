@@ -8,6 +8,8 @@ import { GENDER_ENUM, ROLE_ENUM } from 'src/users/entities/enums';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto';
+import { Tokens } from './types';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -59,7 +61,7 @@ describe('AuthService', () => {
     status: jest.fn(() => res),
   };
 
-  const userDummy = {
+  const userDummy: User = {
     id: 5,
     email: 'test@email.com',
     password: 'tester1234',
@@ -74,21 +76,26 @@ describe('AuthService', () => {
     posts: [],
   };
 
+  const tokens: Tokens = {
+    accessToken: 'testAccessToken',
+    refreshToken: 'testRefreshToken',
+  };
+
   describe('findUser', () => {
     it('return user by email', async () => {
-      const UserSpy = jest
+      const userSpy = jest
         .spyOn(service, 'findUserByEmail')
         .mockResolvedValue(userDummy);
 
       const user = await service.findUserByEmail(userDummy.email);
       res.status.mockReturnValue(200);
 
-      expect(UserSpy).toHaveBeenCalledWith('test@email.com');
+      expect(userSpy).toHaveBeenCalledWith('test@email.com');
       expect(user).toEqual(userDummy);
       expect(res.status()).toBe(200);
     });
 
-    it('return 404 error for user by email', async () => {
+    it('return 404 error for finding user by email', async () => {
       jest.spyOn(service, 'findUserByEmail').mockResolvedValue(userDummy);
 
       await service.findUserByEmail(userDummy.email);
@@ -98,25 +105,77 @@ describe('AuthService', () => {
     });
 
     it('return user by id', async () => {
-      const UserSpy = jest
+      const userSpy = jest
         .spyOn(service, 'findUserById')
         .mockResolvedValue(userDummy);
 
       const user = await service.findUserById(userDummy.id);
       res.status.mockReturnValue(200);
 
-      expect(UserSpy).toHaveBeenCalledWith(5);
+      expect(userSpy).toHaveBeenCalledWith(5);
       expect(user).toEqual(userDummy);
       expect(res.status()).toBe(200);
     });
 
-    it('return 404 error for user by id', async () => {
+    it('return 404 error for finding user by id', async () => {
       jest.spyOn(service, 'findUserById').mockResolvedValue(userDummy);
 
       await service.findUserById(userDummy.id);
       res.status.mockReturnValue(404);
 
       expect(res.status()).toBe(404);
+    });
+  });
+
+  describe('login', () => {
+    it('return tokens by email and id', async () => {
+      const userSpy = jest
+        .spyOn(service, 'makeTokens')
+        .mockResolvedValue(tokens);
+
+      const user = await service.makeTokens('test@email.com', 5);
+      res.status.mockReturnValue(200);
+
+      expect(userSpy).toHaveBeenCalledWith('test@email.com', 5);
+      expect(user).toEqual(tokens);
+      expect(res.status()).toBe(200);
+    });
+
+    it('return 401 error for making tokens', async () => {
+      jest.spyOn(service, 'makeTokens').mockResolvedValue(tokens);
+
+      await service.makeTokens('test@email.com', 5);
+      res.status.mockReturnValue(401);
+
+      expect(res.status()).toBe(401);
+    });
+
+    it('login success', async () => {
+      const dto = new LoginDto();
+
+      const userSpy = jest
+        .spyOn(service, 'login')
+        .mockResolvedValue({ user: userDummy, tokens });
+
+      const user = await service.login(dto);
+      res.status.mockReturnValue(200);
+
+      expect(userSpy).toHaveBeenCalledWith(dto);
+      expect(user).toEqual({ user: userDummy, tokens });
+      expect(res.status()).toBe(200);
+    });
+
+    it('login failed', async () => {
+      const dto = new LoginDto();
+
+      jest
+        .spyOn(service, 'login')
+        .mockResolvedValue({ user: userDummy, tokens });
+
+      await service.login(dto);
+      res.status.mockReturnValue(401);
+
+      expect(res.status()).toBe(401);
     });
   });
 });
