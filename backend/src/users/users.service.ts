@@ -39,7 +39,7 @@ export class UsersService {
   async findUserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
 
-    if (!user) {
+    if (!user || user.isDeleted) {
       throw new NotFoundException('User not found.');
     }
 
@@ -52,6 +52,7 @@ export class UsersService {
       throw new NotFoundException('User not found.');
     }
 
-    await this.userRepository.remove(user);
+    user.isDeleted = true;
+    await this.userRepository.save(user);
   }
 }

@@ -8,6 +8,7 @@ import { DatabaseModule } from './database/database.module';
 import { AllExceptionsFilter } from './filters/all-exception.filter';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { UsersModule } from './users/users.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UsersModule } from './users/users.module';
     }),
     DatabaseModule,
     UsersModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [
