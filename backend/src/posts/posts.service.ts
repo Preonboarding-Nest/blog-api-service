@@ -20,18 +20,16 @@ export class PostsService {
   ) {}
 
   async create(createPostDto: CreatePostDto): Promise<number> {
-    // Todo 게시글 종류 모델이 개발되면 연관관게 설정 후 저장하도록 변경 예정
-    // Todo 생성자를 toEntity()를 사용하면 좋을 듯 하다.
-    const postCategory = this.postCategoryRepository.findOneBy({
-      id: createPostDto.categoryId,
+    const categoryId = createPostDto.categoryId;
+    const postCategory = await this.postCategoryRepository.findOneBy({
+      id: categoryId,
     });
     if (!postCategory) {
-      throw new NotFoundException(
-        `postCategory not found, id = ${createPostDto.categoryId}`,
-      );
+      throw new NotFoundException(`postCategory not found, id = ${categoryId}`);
     }
 
-    const post = new Post(createPostDto.title, createPostDto.content);
+    const post = createPostDto.toEntity(postCategory);
+
     // 임시로 2번 회원으로 설정하여 저장
     post.user = await this.userRepository.findOneBy({ id: 2 });
     const savedPost = await this.postRepository.save(post);
