@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -6,6 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreatePostCategoryDto } from './dto/create-postCategory.dto';
+import { UpdatePostCategoryDto } from './dto/update-postCategory.dto';
 import { PostCategory } from './entities/post-category.entity';
 import { PostsCategoryService } from './posts-category.service';
 
@@ -28,7 +38,6 @@ export class PostsCategoryController {
 
   @ApiOperation({ summary: '게시글 종류 조회 API' })
   @ApiOkResponse({
-    status: HttpStatus.OK,
     description: '게시글 종류 조회 성공',
     type: PostCategory,
     isArray: true,
@@ -36,5 +45,21 @@ export class PostsCategoryController {
   @Get()
   async findAllPostCategories(): Promise<PostCategory[]> {
     return this.postsCategoryService.findAllPostCategories();
+  }
+
+  @ApiOperation({ summary: '게시글 종류 수정 API' })
+  @ApiOkResponse({
+    description: '게시글 종류 수정 성공',
+    type: PostCategory,
+  })
+  @Patch('/:id')
+  updatePostCategory(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePostCategoryDto: UpdatePostCategoryDto,
+  ): Promise<PostCategory> {
+    return this.postsCategoryService.updatePostCategory(
+      id,
+      updatePostCategoryDto,
+    );
   }
 }
