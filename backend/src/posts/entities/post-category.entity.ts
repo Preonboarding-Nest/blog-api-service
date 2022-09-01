@@ -9,6 +9,7 @@ export class PostCategory {
     type: 'varchar',
     length: 50,
     comment: '해당 컬럼은 게시글 종류의 이름을 나타냅니다.',
+    unique: true,
   })
   type: string;
 }
