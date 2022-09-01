@@ -11,7 +11,9 @@ export class PostsCategoryService {
     private postCategoryRepository: Repository<PostCategory>,
   ) {}
 
-  async createPostCategory(createPostCategoryDto: CreatePostCategoryDto) {
+  async createPostCategory(
+    createPostCategoryDto: CreatePostCategoryDto,
+  ): Promise<PostCategory> {
     const { type } = createPostCategoryDto;
     const existingPostCategory = await this.postCategoryRepository.findOne({
       where: { type },
@@ -24,5 +26,10 @@ export class PostsCategoryService {
     const postCategory = await this.postCategoryRepository.create({ type });
 
     return await this.postCategoryRepository.save(postCategory);
+  }
+
+  async findAllPostCategories(): Promise<PostCategory[]> {
+    const postCategories = await this.postCategoryRepository.find();
+    return postCategories;
   }
 }

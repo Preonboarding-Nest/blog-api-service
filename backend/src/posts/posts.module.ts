@@ -9,7 +9,7 @@ import { PostCategory } from './entities/post-category.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Post, PostCategory])],
-  controllers: [PostsController, PostsCategoryController],
+  controllers: [PostsCategoryController, PostsController],
   providers: [PostsService, PostsCategoryService],
 })
 export class PostsModule {}

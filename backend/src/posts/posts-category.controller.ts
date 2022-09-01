@@ -1,6 +1,12 @@
 import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreatePostCategoryDto } from './dto/create-postCategory.dto';
+import { PostCategory } from './entities/post-category.entity';
 import { PostsCategoryService } from './posts-category.service';
 
 @ApiTags('Posts API')
@@ -11,12 +17,24 @@ export class PostsCategoryController {
   @ApiOperation({ summary: '게시글 종류 등록 API' })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: '게시글 정류 등록 성공',
+    description: '게시글 종류 등록 성공',
   })
   @Post()
   createPostCategory(
     @Body() createPostCategoryDto: CreatePostCategoryDto,
   ): void {
     this.postsCategoryService.createPostCategory(createPostCategoryDto);
+  }
+
+  @ApiOperation({ summary: '게시글 종류 조회 API' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: '게시글 종류 조회 성공',
+    type: PostCategory,
+    isArray: true,
+  })
+  @Get()
+  async findAllPostCategories(): Promise<PostCategory[]> {
+    return this.postsCategoryService.findAllPostCategories();
   }
 }
