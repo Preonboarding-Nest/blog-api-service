@@ -28,7 +28,10 @@ export class PostsService {
       throw new NotFoundException(`postCategory not found, id = ${categoryId}`);
     }
 
-    const post = createPostDto.toEntity(postCategory);
+    const post = new Post();
+    post.title = createPostDto.title;
+    post.content = createPostDto.content;
+    post.postCategory = postCategory;
 
     // 임시로 2번 회원으로 설정하여 저장
     post.user = await this.userRepository.findOneBy({ id: 2 });
