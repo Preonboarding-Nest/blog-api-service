@@ -13,9 +13,10 @@ import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { FindPostResponseDto } from './dto/find-post.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('posts')
+@ApiTags('Posts API')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
@@ -25,8 +26,8 @@ export class PostsController {
     description: '게시글 등록 성공',
   })
   @Post()
-  create(@Body() createPostDto: CreatePostDto): void {
-    this.postsService.create(createPostDto);
+  create(@Body() createPostDto: CreatePostDto): Promise<number> {
+    return this.postsService.create(createPostDto);
   }
 
   @ApiOperation({ summary: '게시글 목록 조회 API' })

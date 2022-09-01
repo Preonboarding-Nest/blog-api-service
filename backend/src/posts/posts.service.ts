@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { FindPostResponseDto } from './dto/find-post.dto';
@@ -11,25 +12,35 @@ export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createPostDto: CreatePostDto): Promise<void> {
+  async create(createPostDto: CreatePostDto): Promise<number> {
     // Todo 게시글 종류 모델이 개발되면 연관관게 설정 후 저장하도록 변경 예정
     const post = new Post(createPostDto.title, createPostDto.content);
-    await this.postRepository.save(post);
+    // 임시로 2번 회원으로 설정하여 저장
+    post.user = await this.userRepository.findOneBy({ id: 2 });
+    const savedPost = await this.postRepository.save(post);
+    return savedPost.id;
   }
 
   async findAll(): Promise<FindPostResponseDto[]> {
-    // Todo 사용자 모델이 개발되면 사용자 정보도 응답해주도록 변경 예정
-    const posts: Post[] = await this.postRepository.find();
+    const posts: Post[] = await this.postRepository.find({
+      relations: ['user'],
+    });
     return posts
       .filter((p) => p.isDeleted === false)
-      .map((p) => new FindPostResponseDto().of(p));
+      .map((p) => {
+        return new FindPostResponseDto().of(p);
+      });
   }
 
   async findOne(id: number): Promise<FindPostResponseDto> {
-    // Todo 사용자 모델이 개발되면 사용자 정보도 응답해주도록 변경 예정
-    const post: Post = await this.postRepository.findOneBy({ id });
+    const post: Post = await this.postRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
     if (!post || post.isDeleted) {
       throw new NotFoundException(`post not found, id = ${id}`);
     }
