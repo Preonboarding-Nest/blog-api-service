@@ -26,8 +26,8 @@ export class PostsController {
     description: '게시글 등록 성공',
   })
   @Post()
-  create(@Body() createPostDto: CreatePostDto): void {
-    this.postsService.create(createPostDto);
+  create(@Body() createPostDto: CreatePostDto): Promise<number> {
+    return this.postsService.create(createPostDto);
   }
 
   @ApiOperation({ summary: '게시글 목록 조회 API' })
