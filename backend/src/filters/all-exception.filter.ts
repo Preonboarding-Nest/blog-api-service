@@ -6,7 +6,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { HttpStatusMessage } from '../commons/constants';
 import { Response } from '../commons/interfaces/response.interface';
 
 @Catch()
@@ -25,9 +24,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    const httpException: HttpException = exception as HttpException;
+    const response: object = httpException.getResponse() as object;
+
     const responseBody: Response<void> = {
       status: 'error',
-      message: HttpStatusMessage[httpStatus],
+      message: response['message'],
     };
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
