@@ -10,6 +10,7 @@ import {
   Post,
 } from '@nestjs/common';
 import {
+  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -30,6 +31,7 @@ export class PostsCategoryController {
     status: HttpStatus.CREATED,
     description: '게시글 종류 등록 성공',
   })
+  @ApiBody({ type: CreatePostCategoryDto })
   @Post()
   createPostCategory(
     @Body() createPostCategoryDto: CreatePostCategoryDto,

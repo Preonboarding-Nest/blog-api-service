@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotAcceptableException,
   NotFoundException,
@@ -25,7 +26,7 @@ export class PostsCategoryService {
     });
 
     if (existingPostCategory) {
-      throw new NotAcceptableException('Post Category already exists.');
+      throw new BadRequestException('Post Category already exists.');
     }
 
     const postCategory = await this.postCategoryRepository.create({ type });
