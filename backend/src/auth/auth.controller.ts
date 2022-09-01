@@ -79,6 +79,7 @@ export class AuthController {
     };
   }
 
+  @HttpCode(201)
   @Post('logout')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
@@ -107,8 +108,19 @@ export class AuthController {
     }
   }
 
+  @HttpCode(200)
   @Get('token')
   @UseGuards(AuthGuard('refresh'))
+  @ApiOperation({
+    summary: '유저 액세스 토큰 발행 API',
+    description: '유저의 refreshToken으로 accessToken을 발행한다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '액세스 토큰 발행 성공',
+  })
+  @ApiCookieAuth('refreshToken')
+  @ApiCookieAuth('accessToken')
   async token(
     @GetCurrentUserId() id: number,
     @Res({ passthrough: true }) res: Response,
