@@ -13,7 +13,7 @@ export class StatisticsListener {
     private readonly statisticsRepository: Repository<Statistic>,
   ) {}
 
-  @OnEvent(EVENTS.STATISTICS_SAVE)
+  @OnEvent(EVENTS.STATISTICS_SAVE, { async: true })
   async handleStatisticsSaveEvent(event: StatisticsSaveEvent): Promise<void> {
     const { path, method } = event;
 

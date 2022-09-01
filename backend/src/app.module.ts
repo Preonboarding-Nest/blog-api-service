@@ -46,10 +46,6 @@ import { UsersModule } from './users/users.module';
       useClass: ResponseInterceptor,
     },
     {
-      provide: APP_INTERCEPTOR,
-      useClass: StatisticsInterceptor,
-    },
-    {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
