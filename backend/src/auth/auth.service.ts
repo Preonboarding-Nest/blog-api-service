@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { RedisService } from '../redis/redis.service';
 import { User } from '../users/entities/user.entity';
 import { LoginDto } from './dto';
 import { JwtPayload, Tokens } from './types';
@@ -19,6 +20,7 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly redisService: RedisService,
   ) {}
 
   async findUserByEmail(email: string): Promise<User> {
@@ -42,7 +44,12 @@ export class AuthService {
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
     const tokens: Tokens = await this.makeTokens(email, user.id);
-    // redis에 저장
+
+    await this.redisService.setKey(
+      'refresh' + user.id.toString(),
+      tokens.refreshToken,
+      this.configService.get('JWT_REFRESH_EXPIRESIN'),
+    );
 
     return { user, tokens };
   }
@@ -68,12 +75,10 @@ export class AuthService {
   }
 
   async logout() {
-    // logout
     return 'logout!';
   }
 
   token() {
-    // token
     return 'token!';
   }
 }
