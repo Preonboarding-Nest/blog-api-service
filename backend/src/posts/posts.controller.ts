@@ -84,12 +84,16 @@ export class PostsController {
     status: HttpStatus.OK,
     description: '게시글 수정 성공',
   })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiCookieAuth('refreshToken')
+  @ApiCookieAuth('accessToken')
   @Patch(':id')
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @GetCurrentUserId() currentUserId: number,
+    @Param('id', ParseIntPipe) postId: number,
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<void> {
-    await this.postsService.update(id, updatePostDto);
+    await this.postsService.update(currentUserId, postId, updatePostDto);
   }
 
   @ApiOperation({ summary: '게시글 삭제 API' })

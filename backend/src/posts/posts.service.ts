@@ -139,21 +139,39 @@ export class PostsService {
     return new FindPostResponseDto().of(post);
   }
 
-  async update(id: number, updatePostDto: UpdatePostDto): Promise<void> {
+  async update(
+    currentUserId: number,
+    postId: number,
+    updatePostDto: UpdatePostDto,
+  ): Promise<void> {
+    const currentUser = await this.userRepository.findOneBy({
+      id: currentUserId,
+    });
     const { title, content } = updatePostDto;
-    const post: Post = await this.postRepository.findOneBy({ id });
-    if (!post || post.isDeleted) {
-      throw new NotFoundException(`post not found, id = ${id}`);
+    const post: Post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: ['user'],
+    });
+
+    if (!currentUser || currentUser.isDeleted) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
+    if (!post || post.isDeleted) {
+      throw new NotFoundException(`게시글을 찾을 수 없습니다. id = ${postId}`);
+    }
+    if (post.user.id !== currentUserId) {
+      throw new ForbiddenException('본인이 작성한 게시글이 아닙니다.');
+    }
+
     // 기존 게시글의 내용을 모두 전송한다고 가정하고 구현
-    await this.postRepository.update(id, { title, content });
+    await this.postRepository.update(postId, { title, content });
   }
 
-  async remove(id: number): Promise<void> {
-    const post = await this.postRepository.findOneBy({ id });
+  async remove(postId: number): Promise<void> {
+    const post = await this.postRepository.findOneBy({ id: postId });
     if (!post || post.isDeleted) {
-      throw new NotFoundException(`post not found, id = ${id}`);
+      throw new NotFoundException(`post not found, id = ${postId}`);
     }
-    await this.postRepository.update(id, { isDeleted: true });
+    await this.postRepository.update(postId, { isDeleted: true });
   }
 }
