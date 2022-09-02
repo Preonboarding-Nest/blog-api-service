@@ -9,11 +9,15 @@ import * as bcrypt from 'bcrypt';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
+import { AuthService } from '../auth/auth.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private authService: AuthService,
+    private redisService: RedisService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -53,6 +57,8 @@ export class UsersService {
     }
 
     user.isDeleted = true;
+    await this.authService.logout(id);
     await this.userRepository.save(user);
+    await this.redisService.delKey('refresh' + id.toString());
   }
 }

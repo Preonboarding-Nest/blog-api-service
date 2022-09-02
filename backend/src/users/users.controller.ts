@@ -8,12 +8,23 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  UnauthorizedException,
+  Redirect,
+  Res,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { GetCurrentUserId } from '../commons/decorators/get.current-userId.decorator';
+import { Response } from 'express';
 
 @Controller('users')
 @ApiTags('Users API')
@@ -37,8 +48,25 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({ summary: '유저 삭제 API', description: '유저를 삭제합니다.' })
   @ApiCreatedResponse({ description: '유저를 삭제합니다.', type: null })
+  @ApiCookieAuth('refreshToken')
+  @ApiCookieAuth('accessToken')
   @UseGuards(AuthGuard('jwt'))
-  removeUserById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  removeUserById(
+    @Param('id', ParseIntPipe) id: number,
+    @GetCurrentUserId() currentUserId: number,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    if (id !== currentUserId) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      res.clearCookie('AccessToken');
+      res.clearCookie('RefreshToken');
+    } catch (error) {
+      throw new ForbiddenException('Cookie access 실패');
+    }
+
     return this.usersService.removeUserById(id);
   }
 }
