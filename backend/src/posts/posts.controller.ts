@@ -50,9 +50,15 @@ export class PostsController {
     description: '게시글 목록 조회 성공',
     type: FindPostResponseDto,
   })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiCookieAuth('refreshToken')
+  @ApiCookieAuth('accessToken')
   @Get()
-  async findAll(): Promise<FindPostResponseDto[]> {
-    return await this.postsService.findAll();
+  async findAll(
+    @GetCurrentUserId() userId: number,
+    @Body() categoryId: number,
+  ): Promise<FindPostResponseDto[]> {
+    return await this.postsService.findAll(userId, categoryId);
   }
 
   @ApiOperation({ summary: '게시글 상세 조회 API' })

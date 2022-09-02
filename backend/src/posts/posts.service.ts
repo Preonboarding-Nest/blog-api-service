@@ -41,6 +41,10 @@ export class PostsService {
       id: categoryId,
     });
 
+    if (!currentUser || currentUser.isDeleted) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
     if (!postCategory) {
       throw new NotFoundException(
         `게시글 종류를 찾을 수 없습니다. id = ${categoryId}`,
@@ -64,20 +68,40 @@ export class PostsService {
     post.postCategory = postCategory;
     post.user = currentUser;
 
-    if (!post.user || post.user.isDeleted) {
-      throw new NotFoundException('사용자를 찾을 수 없습니다.');
-    }
     const savedPost = await this.postRepository.save(post);
     return savedPost.id;
   }
 
-  async findAll(): Promise<FindPostResponseDto[]> {
+  async findAll(
+    userId: number,
+    categoryId: number,
+  ): Promise<FindPostResponseDto[]> {
+    const currentUser = await this.userRepository.findOneBy({ id: userId });
+    const postCategory = await this.postCategoryRepository.findOneBy({
+      id: categoryId,
+    });
+
+    if (!currentUser || currentUser.isDeleted) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+    if (!postCategory) {
+      throw new NotFoundException(
+        `게시글 종류를 찾을 수 없습니다. id = ${categoryId}`,
+      );
+    }
+    if (
+      currentUser.role === ROLE_ENUM.USER &&
+      postCategory.id === POST_TYPE_ENUM.PROD
+    ) {
+      throw new ForbiddenException('운영 게시판에 접근 권한이 없습니다.');
+    }
+
     const posts: Post[] = await this.postRepository.find({
+      where: { isDeleted: false, postCategory },
       relations: ['user'],
     });
-    return posts
-      .filter((p) => p.isDeleted === false)
-      .map((p) => new FindPostResponseDto().of(p));
+
+    return posts.map((p) => new FindPostResponseDto().of(p));
   }
 
   async findOne(id: number): Promise<FindPostResponseDto> {
