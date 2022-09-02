@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
@@ -8,12 +9,36 @@ import { GENDER_ENUM } from './entities/enums';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
-const mockUserRepository = () => ({
-  create: jest.fn().mockImplementation((user) => user),
-  save: jest.fn().mockImplementation((user) => user),
-  find: jest.fn(),
-  findOne: jest.fn(),
-});
+const mockUserRepository = () => {
+  const users: User[] = [];
+
+  return {
+    create: jest.fn().mockImplementation((user) => user),
+    save: jest.fn().mockImplementation((user) => {
+      users.push(user);
+      console.log('users', users);
+      return user;
+    }),
+    find: jest.fn(),
+    findOne: jest.fn().mockImplementation((query) => {
+      const where = query.where;
+
+      let existingUser: User;
+
+      if (where.email) {
+        console.log(where.email);
+        users.forEach((user) => {
+          if (user.email === where.email) {
+            console.log('match');
+            existingUser = user;
+          }
+        });
+      }
+
+      return existingUser;
+    }),
+  };
+};
 
 const mockAuthService = () => ({});
 const mockRedisService = () => ({
@@ -69,5 +94,24 @@ describe('UsersService', () => {
     const user = await service.createUser(userInfo);
 
     expect(user.password).not.toEqual(password);
+  });
+
+  it('throws an exception if user tries to create a new user with email that is in use', async () => {
+    const password = 'tester123!';
+    const userInfo: CreateUserDto = {
+      email: 'test@test.com',
+      password,
+      phone: '01012341234',
+      age: 28,
+      gender: GENDER_ENUM.MALE,
+    };
+
+    const user = await service.createUser(userInfo);
+
+    console.log(user);
+
+    await expect(service.createUser(userInfo)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
   });
 });
