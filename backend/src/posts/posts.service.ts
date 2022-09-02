@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -7,6 +11,8 @@ import { FindPostResponseDto } from './dto/find-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 import { PostCategory } from './entities/post-category.entity';
+import { ROLE_ENUM } from '../users/entities/enums';
+import { POST_TYPE_ENUM } from '../commons/enums/commons.enums';
 
 @Injectable()
 export class PostsService {
@@ -19,6 +25,14 @@ export class PostsService {
     private readonly postCategoryRepository: Repository<PostCategory>,
   ) {}
 
+  /**
+   * [게시글 종류별 접근 권한 체크]
+   * 모든 게시판의 UD는 사용자 권한에 상관없이 본인이 작성한 글만 접근 가능하다.
+   * 자유 게시판: (운영자 CRUD, 유저: CRUD)
+   * 공지 게시판: (운영자 CRUD, 유저: R)
+   * 운영 게시판: (운영자 CRUD)
+   */
+
   async create(createPostDto: CreatePostDto, userId: number): Promise<number> {
     const post = new Post();
     const categoryId = createPostDto.categoryId;
@@ -29,8 +43,20 @@ export class PostsService {
 
     if (!postCategory) {
       throw new NotFoundException(
-        `게시글 종류를 찾을 수 없습니다., id = ${categoryId}`,
+        `게시글 종류를 찾을 수 없습니다. id = ${categoryId}`,
       );
+    }
+    if (
+      currentUser.role === ROLE_ENUM.USER &&
+      postCategory.id === POST_TYPE_ENUM.NOTICE
+    ) {
+      throw new ForbiddenException('공지 게시판의 접근 권한이 없습니다.');
+    }
+    if (
+      currentUser.role === ROLE_ENUM.USER &&
+      postCategory.id === POST_TYPE_ENUM.PROD
+    ) {
+      throw new ForbiddenException('운영 게시판의 접근 권한이 없습니다.');
     }
 
     post.title = createPostDto.title;
@@ -39,7 +65,7 @@ export class PostsService {
     post.user = currentUser;
 
     if (!post.user || post.user.isDeleted) {
-      throw new NotFoundException('user not found');
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
     const savedPost = await this.postRepository.save(post);
     return savedPost.id;
