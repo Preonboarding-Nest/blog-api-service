@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { RedisService } from 'src/redis/redis.service';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { GENDER_ENUM } from './entities/enums';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -53,21 +55,19 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
-  // it('creates a new user with a salted and hashed password', async () => {
-  //   const users: User[] = [];
+  it('creates a new user with a salted and hashed password', async () => {
+    const users: User[] = [];
 
-  //   const password = 'tester123!';
-  //   const userInfo: CreateUserDto = {
-  //     email: 'test@test.com',
-  //     password,
-  //     phone: '01012341234',
-  //     age: 28,
-  //     gender: GENDER_ENUM.MALE,
-  //   };
-  //   const user = await service.createUser(userInfo);
+    const password = 'tester123!';
+    const userInfo: CreateUserDto = {
+      email: 'test@test.com',
+      password,
+      phone: '01012341234',
+      age: 28,
+      gender: GENDER_ENUM.MALE,
+    };
+    const user = await service.createUser(userInfo);
 
-  //   console.log('user', user);
-  //   console.log(users);
-  //   expect(user.password).not.toEqual(password);
-  // });
+    expect(user.password).not.toEqual(password);
+  });
 });
