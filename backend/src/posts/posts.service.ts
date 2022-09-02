@@ -20,20 +20,23 @@ export class PostsService {
   ) {}
 
   async create(createPostDto: CreatePostDto, userId: number): Promise<number> {
+    const post = new Post();
     const categoryId = createPostDto.categoryId;
+    const currentUser = await this.userRepository.findOneBy({ id: userId });
     const postCategory = await this.postCategoryRepository.findOneBy({
       id: categoryId,
     });
+
     if (!postCategory) {
-      throw new NotFoundException(`postCategory not found, id = ${categoryId}`);
+      throw new NotFoundException(
+        `게시글 종류를 찾을 수 없습니다., id = ${categoryId}`,
+      );
     }
 
-    const post = new Post();
     post.title = createPostDto.title;
     post.content = createPostDto.content;
     post.postCategory = postCategory;
-
-    post.user = await this.userRepository.findOneBy({ id: userId });
+    post.user = currentUser;
 
     if (!post.user || post.user.isDeleted) {
       throw new NotFoundException('user not found');
