@@ -47,7 +47,8 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
     const user: User = await this.findUserByEmail(email);
-    if (!user) throw new NotFoundException('회원이 존재하지 않습니다.');
+    if (!user || user.isDeleted)
+      throw new NotFoundException('회원이 존재하지 않습니다.');
 
     const isPwMatching: boolean = await bcrypt.compare(password, user.password);
     if (!isPwMatching)
