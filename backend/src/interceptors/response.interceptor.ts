@@ -15,7 +15,7 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
   ): Observable<Response<T>> {
     return next.handle().pipe(
       map((data) => {
-        if (!data.message) {
+        if (!data?.message) {
           return {
             status: 'success',
             data,

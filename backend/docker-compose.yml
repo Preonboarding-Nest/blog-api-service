@@ -10,3 +10,10 @@ services:
     volumes:
       - ./data/:/data
       - ./conf/redis.conf:/usr/local/conf/redis.conf
+  backend:
+    image: ghcr.io/preonboarding-nest/wanted_waynehills:latest
+    ports:
+      - 4000:4000
+    depends_on:
+      - redis
+    restart: 'on-failure'

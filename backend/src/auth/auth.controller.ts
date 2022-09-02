@@ -7,7 +7,7 @@ import {
   Logger,
   Post,
   Res,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
@@ -16,7 +16,7 @@ import {
   ApiCookieAuth,
   ApiOperation,
   ApiResponse,
-  ApiTags
+  ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { GetCurrentUserId } from '../commons/decorators';

@@ -71,7 +71,9 @@ export class PostsCategoryController {
     description: '게시글 종류 삭제 성공',
   })
   @Delete('/:id')
-  deletePostCategory(@Param('id', ParseIntPipe) id: number): void {
-    this.postsCategoryService.deletePostCategory(id);
+  async deletePostCategory(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
+    await this.postsCategoryService.deletePostCategory(id);
   }
 }
