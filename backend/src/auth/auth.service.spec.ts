@@ -74,6 +74,7 @@ describe('AuthService', () => {
     isDeleted: false,
     role: ROLE_ENUM.USER,
     posts: [],
+    statistics: [],
   };
 
   const tokens: Tokens = {
@@ -96,6 +97,7 @@ describe('AuthService', () => {
     });
 
     it('return 404 error for finding user by email', async () => {
+      // test case 추가해야함
       jest.spyOn(service, 'findUserByEmail').mockResolvedValue(userDummy);
 
       await service.findUserByEmail(userDummy.email);
@@ -118,6 +120,7 @@ describe('AuthService', () => {
     });
 
     it('return 404 error for finding user by id', async () => {
+      // test case 추가해야함
       jest.spyOn(service, 'findUserById').mockResolvedValue(userDummy);
 
       await service.findUserById(userDummy.id);
@@ -142,6 +145,7 @@ describe('AuthService', () => {
     });
 
     it('return 401 error for making tokens', async () => {
+      // test case 추가해야함
       jest.spyOn(service, 'makeTokens').mockResolvedValue(tokens);
 
       await service.makeTokens('test@email.com', 5);
@@ -165,14 +169,64 @@ describe('AuthService', () => {
       expect(res.status()).toBe(200);
     });
 
-    it('login failed', async () => {
+    it('return 401 error login failed', async () => {
+      // test case 추가해야함
       const dto = new LoginDto();
 
-      jest
-        .spyOn(service, 'login')
-        .mockResolvedValue({ user: userDummy, tokens });
+      jest.spyOn(service, 'login').mockResolvedValue({
+        user: userDummy,
+        tokens: { accessToken: '', refreshToken: '' },
+      });
 
       await service.login(dto);
+      res.status.mockReturnValue(401);
+
+      expect(res.status()).toBe(401);
+    });
+  });
+
+  describe('logout', () => {
+    it('return true by id and logout', async () => {
+      const userSpy = jest.spyOn(service, 'logout').mockResolvedValue(true);
+
+      const user = await service.logout(5);
+      res.status.mockReturnValue(200);
+
+      expect(userSpy).toHaveBeenCalledWith(5);
+      expect(user).toEqual(true);
+      expect(res.status()).toBe(200);
+    });
+
+    it('return 401 error logout failed', async () => {
+      // test case 추가해야함
+      jest.spyOn(service, 'logout').mockResolvedValue(false);
+
+      await service.logout(5);
+      res.status.mockReturnValue(401);
+
+      expect(res.status()).toBe(401);
+    });
+  });
+
+  describe('token', () => {
+    it('return accesstoken by id and refresh', async () => {
+      const userSpy = jest
+        .spyOn(service, 'token')
+        .mockResolvedValue(tokens.accessToken);
+
+      const user = await service.token(5);
+      res.status.mockReturnValue(200);
+
+      expect(userSpy).toHaveBeenCalledWith(5);
+      expect(user).toEqual(tokens.accessToken);
+      expect(res.status()).toBe(200);
+    });
+
+    it('return 401 error token failed', async () => {
+      // test case 추가해야함
+      jest.spyOn(service, 'token').mockResolvedValue('');
+
+      await service.token(5);
       res.status.mockReturnValue(401);
 
       expect(res.status()).toBe(401);
