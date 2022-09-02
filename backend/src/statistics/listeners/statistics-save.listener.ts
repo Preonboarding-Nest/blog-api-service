@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { EVENTS } from '../../commons/constants';
 import { Statistic } from '../entities/statistic.entity';
 import { StatisticsSaveEvent } from '../events/statistics-save.event';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class StatisticsListener {
@@ -15,12 +16,19 @@ export class StatisticsListener {
 
   @OnEvent(EVENTS.STATISTICS_SAVE, { async: true })
   async handleStatisticsSaveEvent(event: StatisticsSaveEvent): Promise<void> {
-    const { path, method } = event;
+    const { resource, method, userId } = event;
 
     await this.statisticsRepository.save(
       this.statisticsRepository.create({
-        path,
+        resource,
         method,
+        year: dayjs().year(),
+        month: dayjs().month() + 1,
+        date: dayjs().date(),
+        hour: dayjs().hour(),
+        min: dayjs().minute(),
+        sec: dayjs().second(),
+        user: userId ? { id: userId } : null,
       }),
     );
   }
