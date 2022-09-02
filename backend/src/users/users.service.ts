@@ -17,7 +17,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     private authService: AuthService,
-    private readonly redisService: RedisService,
+    private redisService: RedisService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
