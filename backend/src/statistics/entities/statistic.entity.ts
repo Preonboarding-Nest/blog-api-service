@@ -1,11 +1,4 @@
-import { HTTP_METHOD_ENUM } from '../../commons/enums/commons.enums';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
@@ -15,25 +8,55 @@ export class Statistic {
 
   @Column({
     type: 'varchar',
-    length: 100,
-    comment: '해당 컬럼은 API 요청 경로를 나타냅니다.',
+    length: 20,
+    nullable: false,
+    comment: '해당 컬럼은 API 요청 정보를 나타냅니다.',
   })
-  path: string;
+  resource: string;
 
   @Column({
-    type: 'enum',
-    enum: HTTP_METHOD_ENUM,
+    type: 'varchar',
+    length: 20,
     nullable: false,
-    comment: '해당 컬럼은 http method를 나타냅니다.',
+    comment: '해당 컬럼은 API 요청 method를 나타냅니다.',
   })
-  method: HTTP_METHOD_ENUM;
+  method: string;
 
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'now()',
-    comment: '해당 컬럼은 요청 시간을 나타냅니다.',
+  @Column({
+    type: 'int',
+    comment: '해당 컬럼은 데이터 저장 년도(YYYY)를 나타냅니다.',
   })
-  timestamp: Date;
+  year: number;
+
+  @Column({
+    type: 'int',
+    comment: '해당 컬럼은 데이터 저장 월(1~12)을 나타냅니다.',
+  })
+  month: number;
+
+  @Column({
+    type: 'int',
+    comment: '해당 컬럼은 데이터 저장 일자(0~31)를 나타냅니다.',
+  })
+  date: number;
+
+  @Column({
+    type: 'int',
+    comment: '해당 컬럼은 데이터 저장 시간(0~23)을 나타냅니다.',
+  })
+  hour: number;
+
+  @Column({
+    type: 'int',
+    comment: '해당 컬럼은 데이터 저장 분(0~59)을 나타냅니다.',
+  })
+  min: number;
+
+  @Column({
+    type: 'int',
+    comment: '해당 컬럼은 데이터 저장 초(0~59)를 나타냅니다.',
+  })
+  sec: number;
 
   @ManyToOne(() => User, (user) => user.statistics)
   user: User;
