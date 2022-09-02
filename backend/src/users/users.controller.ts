@@ -14,7 +14,12 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCookieAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { GetCurrentUserId } from '../commons/decorators/get.current-userId.decorator';
@@ -42,6 +47,8 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({ summary: '유저 삭제 API', description: '유저를 삭제합니다.' })
   @ApiCreatedResponse({ description: '유저를 삭제합니다.', type: null })
+  @ApiCookieAuth('refreshToken')
+  @ApiCookieAuth('accessToken')
   @UseGuards(AuthGuard('jwt'))
   removeUserById(
     @Param('id', ParseIntPipe) id: number,
