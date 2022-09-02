@@ -11,6 +11,7 @@ import {
   UnauthorizedException,
   Redirect,
   Res,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -59,8 +60,12 @@ export class UsersController {
       throw new UnauthorizedException();
     }
 
-    res.clearCookie('AccessToken');
-    res.clearCookie('RefreshToken');
+    try {
+      res.clearCookie('AccessToken');
+      res.clearCookie('RefreshToken');
+    } catch (error) {
+      throw new ForbiddenException('Cookie access 실패');
+    }
 
     return this.usersService.removeUserById(id);
   }
