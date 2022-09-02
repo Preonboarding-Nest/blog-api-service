@@ -73,10 +73,12 @@ export class PostsService {
   }
 
   async findAll(
-    userId: number,
+    currentUserId: number,
     categoryId: number,
   ): Promise<FindPostResponseDto[]> {
-    const currentUser = await this.userRepository.findOneBy({ id: userId });
+    const currentUser = await this.userRepository.findOneBy({
+      id: currentUserId,
+    });
     const postCategory = await this.postCategoryRepository.findOneBy({
       id: categoryId,
     });
@@ -104,14 +106,36 @@ export class PostsService {
     return posts.map((p) => new FindPostResponseDto().of(p));
   }
 
-  async findOne(id: number): Promise<FindPostResponseDto> {
+  async findOne(
+    currentUserId: number,
+    postId: number,
+    categoryId: number,
+  ): Promise<FindPostResponseDto> {
+    const currentUser = await this.userRepository.findOneBy({
+      id: currentUserId,
+    });
+    const postCategory = await this.postRepository.findOneBy({
+      id: categoryId,
+    });
     const post: Post = await this.postRepository.findOne({
-      where: { id },
+      where: { id: postId },
       relations: ['user'],
     });
-    if (!post || post.isDeleted) {
-      throw new NotFoundException(`post not found, id = ${id}`);
+
+    if (!currentUser || currentUser.isDeleted) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
+    if (!post || post.isDeleted) {
+      throw new NotFoundException(`post not found, id = ${postId}`);
+    }
+
+    if (
+      currentUser.role === ROLE_ENUM.USER &&
+      postCategory.id === POST_TYPE_ENUM.PROD
+    ) {
+      throw new ForbiddenException('운영 게시판에 접근 권한이 없습니다.');
+    }
+
     return new FindPostResponseDto().of(post);
   }
 

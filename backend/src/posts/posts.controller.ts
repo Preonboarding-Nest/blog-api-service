@@ -55,10 +55,10 @@ export class PostsController {
   @ApiCookieAuth('accessToken')
   @Get()
   async findAll(
-    @GetCurrentUserId() userId: number,
-    @Body() categoryId: number,
+    @GetCurrentUserId() currentUserId: number,
+    @Param('categoryId', ParseIntPipe) categoryId: number,
   ): Promise<FindPostResponseDto[]> {
-    return await this.postsService.findAll(userId, categoryId);
+    return await this.postsService.findAll(currentUserId, categoryId);
   }
 
   @ApiOperation({ summary: '게시글 상세 조회 API' })
@@ -67,11 +67,16 @@ export class PostsController {
     description: '게시글 상세 조회 성공',
     type: FindPostResponseDto,
   })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiCookieAuth('refreshToken')
+  @ApiCookieAuth('accessToken')
   @Get(':id')
   async findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @GetCurrentUserId() currentUserId: number,
+    @Param('id', ParseIntPipe) postId: number,
+    @Param('categoryId', ParseIntPipe) categoryId: number,
   ): Promise<FindPostResponseDto> {
-    return await this.postsService.findOne(id);
+    return await this.postsService.findOne(currentUserId, postId, categoryId);
   }
 
   @ApiOperation({ summary: '게시글 수정 API' })
