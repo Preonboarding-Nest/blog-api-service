@@ -33,22 +33,25 @@ export class PostsService {
    * 운영 게시판: (운영자 CRUD)
    */
 
-  async create(createPostDto: CreatePostDto, userId: number): Promise<number> {
+  async create(
+    currentUserId: number,
+    createPostDto: CreatePostDto,
+  ): Promise<number> {
     const post = new Post();
     const categoryId = createPostDto.categoryId;
-    const currentUser = await this.userRepository.findOneBy({ id: userId });
+    const currentUser = await this.userRepository.findOne({
+      where: { id: currentUserId, isDeleted: false },
+    });
     const postCategory = await this.postCategoryRepository.findOneBy({
       id: categoryId,
     });
 
-    if (!currentUser || currentUser.isDeleted) {
+    if (!currentUser) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
     if (!postCategory) {
-      throw new NotFoundException(
-        `게시글 종류를 찾을 수 없습니다. id = ${categoryId}`,
-      );
+      throw new NotFoundException('게시글 종류를 찾을 수 없습니다.');
     }
     if (
       currentUser.role === ROLE_ENUM.USER &&
@@ -76,20 +79,18 @@ export class PostsService {
     currentUserId: number,
     categoryId: number,
   ): Promise<FindPostResponseDto[]> {
-    const currentUser = await this.userRepository.findOneBy({
-      id: currentUserId,
+    const currentUser = await this.userRepository.findOne({
+      where: { id: currentUserId, isDeleted: false },
     });
     const postCategory = await this.postCategoryRepository.findOneBy({
       id: categoryId,
     });
 
-    if (!currentUser || currentUser.isDeleted) {
+    if (!currentUser) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
     if (!postCategory) {
-      throw new NotFoundException(
-        `게시글 종류를 찾을 수 없습니다. id = ${categoryId}`,
-      );
+      throw new NotFoundException('게시글 종류를 찾을 수 없습니다.');
     }
     if (
       currentUser.role === ROLE_ENUM.USER &&
@@ -111,22 +112,25 @@ export class PostsService {
     postId: number,
     categoryId: number,
   ): Promise<FindPostResponseDto> {
-    const currentUser = await this.userRepository.findOneBy({
-      id: currentUserId,
+    const currentUser = await this.userRepository.findOne({
+      where: { id: currentUserId, isDeleted: false },
     });
     const postCategory = await this.postRepository.findOneBy({
       id: categoryId,
     });
     const post: Post = await this.postRepository.findOne({
-      where: { id: postId },
+      where: { id: postId, isDeleted: false },
       relations: ['user'],
     });
 
-    if (!currentUser || currentUser.isDeleted) {
+    if (!currentUser) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
-    if (!post || post.isDeleted) {
-      throw new NotFoundException(`게시글을 찾을 수 없습니다. id = ${postId}`);
+    if (!postCategory) {
+      throw new NotFoundException('게시글 종류를 찾을 수 없습니다.');
+    }
+    if (!post) {
+      throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
 
     if (
@@ -144,20 +148,20 @@ export class PostsService {
     postId: number,
     updatePostDto: UpdatePostDto,
   ): Promise<void> {
-    const currentUser = await this.userRepository.findOneBy({
-      id: currentUserId,
-    });
     const { title, content } = updatePostDto;
+    const currentUser = await this.userRepository.findOne({
+      where: { id: currentUserId, isDeleted: false },
+    });
     const post: Post = await this.postRepository.findOne({
-      where: { id: postId },
+      where: { id: postId, isDeleted: false },
       relations: ['user'],
     });
 
-    if (!currentUser || currentUser.isDeleted) {
+    if (!currentUser) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
-    if (!post || post.isDeleted) {
-      throw new NotFoundException(`게시글을 찾을 수 없습니다. id = ${postId}`);
+    if (!post) {
+      throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
     if (post.user.id !== currentUserId) {
       throw new ForbiddenException('본인이 작성한 게시글이 아닙니다.');
@@ -168,19 +172,19 @@ export class PostsService {
   }
 
   async remove(currentUserId: number, postId: number): Promise<void> {
-    const currentUser = await this.userRepository.findOneBy({
-      id: currentUserId,
+    const currentUser = await this.userRepository.findOne({
+      where: { id: currentUserId, isDeleted: false },
     });
     const post = await this.postRepository.findOne({
-      where: { id: postId },
+      where: { id: postId, isDeleted: false },
       relations: ['user'],
     });
 
-    if (!currentUser || currentUser.isDeleted) {
+    if (!currentUser) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
-    if (!post || post.isDeleted) {
-      throw new NotFoundException(`게시글을 찾을 수 없습니다. id = ${postId}`);
+    if (!post) {
+      throw new NotFoundException('게시글을 찾을 수 없습니다.');
     }
     if (post.user.id !== currentUserId) {
       throw new ForbiddenException('본인이 작성한 게시글이 아닙니다.');

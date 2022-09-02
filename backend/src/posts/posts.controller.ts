@@ -39,9 +39,9 @@ export class PostsController {
   @Post()
   create(
     @Body() createPostDto: CreatePostDto,
-    @GetCurrentUserId() userId: number,
+    @GetCurrentUserId() currentUserId: number,
   ): Promise<number> {
-    return this.postsService.create(createPostDto, userId);
+    return this.postsService.create(currentUserId, createPostDto);
   }
 
   @ApiOperation({ summary: '게시글 목록 조회 API' })
