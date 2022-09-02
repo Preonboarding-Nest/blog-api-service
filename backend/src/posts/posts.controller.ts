@@ -101,8 +101,14 @@ export class PostsController {
     status: HttpStatus.OK,
     description: '게시글 삭제 성공',
   })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiCookieAuth('refreshToken')
+  @ApiCookieAuth('accessToken')
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return await this.postsService.remove(id);
+  async remove(
+    @GetCurrentUserId() currentUserId: number,
+    @Param('id', ParseIntPipe) postId: number,
+  ): Promise<void> {
+    return await this.postsService.remove(currentUserId, postId);
   }
 }

@@ -126,7 +126,7 @@ export class PostsService {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
     if (!post || post.isDeleted) {
-      throw new NotFoundException(`post not found, id = ${postId}`);
+      throw new NotFoundException(`게시글을 찾을 수 없습니다. id = ${postId}`);
     }
 
     if (
@@ -167,11 +167,25 @@ export class PostsService {
     await this.postRepository.update(postId, { title, content });
   }
 
-  async remove(postId: number): Promise<void> {
-    const post = await this.postRepository.findOneBy({ id: postId });
-    if (!post || post.isDeleted) {
-      throw new NotFoundException(`post not found, id = ${postId}`);
+  async remove(currentUserId: number, postId: number): Promise<void> {
+    const currentUser = await this.userRepository.findOneBy({
+      id: currentUserId,
+    });
+    const post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: ['user'],
+    });
+
+    if (!currentUser || currentUser.isDeleted) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
+    if (!post || post.isDeleted) {
+      throw new NotFoundException(`게시글을 찾을 수 없습니다. id = ${postId}`);
+    }
+    if (post.user.id !== currentUserId) {
+      throw new ForbiddenException('본인이 작성한 게시글이 아닙니다.');
+    }
+
     await this.postRepository.update(postId, { isDeleted: true });
   }
 }
