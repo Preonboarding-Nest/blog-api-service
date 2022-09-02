@@ -1,11 +1,11 @@
-import { HTTP_METHOD_ENUM } from 'src/commons/enums/commons.enums';
-
 export class StatisticsSaveEvent {
-  path: string;
-  method: HTTP_METHOD_ENUM;
+  resource: string;
+  method: string;
+  userId: number;
 
-  constructor(path: string, method: HTTP_METHOD_ENUM) {
-    this.path = path;
+  constructor(resource: string, method: string, userId: number = undefined) {
+    this.resource = resource;
     this.method = method;
+    this.userId = userId;
   }
 }

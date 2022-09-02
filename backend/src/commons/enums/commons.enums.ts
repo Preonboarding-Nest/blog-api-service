@@ -1,10 +1,3 @@
-export enum HTTP_METHOD_ENUM {
-  POST = 'post',
-  GET = 'get',
-  PATCH = 'patch',
-  DELETE = 'delete',
-}
-
 /**
  * 1: 자유 게시판
  * 2: 공지 게시판
