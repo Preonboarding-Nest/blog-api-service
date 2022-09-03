@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,9 +9,32 @@ const mockPostCategoryRepository = () => {
   const categories: PostCategory[] = [];
 
   return {
-    create: jest.fn(),
+    create: jest.fn().mockImplementation(({ type }) => {
+      return {
+        id: Math.random(),
+        type,
+      };
+    }),
+    save: jest.fn().mockImplementation((category) => {
+      categories.push(category);
+      return category;
+    }),
     find: jest.fn(),
-    findOne: jest.fn(),
+    findOne: jest.fn().mockImplementation((query) => {
+      const where = query.where;
+
+      let existingPostCategory: PostCategory;
+
+      if (where.type) {
+        categories.forEach((category) => {
+          if (category.type === where.type) {
+            existingPostCategory = category;
+          }
+        });
+      }
+
+      return existingPostCategory;
+    }),
     remove: jest.fn(),
   };
 };
@@ -34,7 +58,15 @@ describe('PostsCategoryService', () => {
     postCategoryRepository = module.get(getRepositoryToken(PostCategory));
   });
 
+  const type = '자유게시판';
+
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should create a new post category', async () => {
+    const postCategory = await service.createPostCategory({ type });
+
+    expect(postCategory.type).toEqual(type);
   });
 });
