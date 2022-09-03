@@ -62,10 +62,8 @@ describe('PostsService', () => {
   };
 
   const findOneResponse = new FindPostResponseDto();
-  findOneResponse.email = 'olaf@naver.com';
-  findOneResponse.id = 1;
-  findOneResponse.title = 'title';
-  findOneResponse.content = 'content';
+
+  const findOneResponses = [new FindPostResponseDto()];
 
   describe('게시글 등록 (사용자 권한)', () => {
     it('자유 게시판 게시글 등록 시 1을 반환한다.', async () => {
@@ -111,7 +109,7 @@ describe('PostsService', () => {
     });
   });
 
-  describe('게시글 목록 조회 (사용자 권한)', () => {
+  describe('게시글 상세 조회 (사용자 권한)', () => {
     it('자유 게시판 조회 성공', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValue(findOneResponse);
       const post = await service.findOne(1, 1, POST_TYPE_ENUM.FREE);
@@ -131,7 +129,7 @@ describe('PostsService', () => {
     });
   });
 
-  describe('게시글 목록 조회 (관리자 권한)', () => {
+  describe('게시글 상세 조회 (관리자 권한)', () => {
     it('자유 게시판 조회 성공', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValue(findOneResponse);
       const post = await service.findOne(1, 1, POST_TYPE_ENUM.FREE);
@@ -146,8 +144,48 @@ describe('PostsService', () => {
 
     it('운영 게시판 조회 성공', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValue(findOneResponse);
-      const post = await service.findOne(1, 1, POST_TYPE_ENUM.FREE);
+      const post = await service.findOne(1, 1, POST_TYPE_ENUM.PROD);
       expect(post).toBe(findOneResponse);
+    });
+  });
+
+  describe('게시글 목록 조회 (사용자 권한)', () => {
+    it('자유 게시판 조회 성공', async () => {
+      jest.spyOn(service, 'findAll').mockResolvedValue(findOneResponses);
+      const posts = await service.findAll(1, POST_TYPE_ENUM.FREE);
+      expect(posts).toBe(findOneResponses);
+    });
+
+    it('공지 게시판 조회 성공', async () => {
+      jest.spyOn(service, 'findAll').mockResolvedValue(findOneResponses);
+      const posts = await service.findAll(1, POST_TYPE_ENUM.FREE);
+      expect(posts).toBe(findOneResponses);
+    });
+
+    it('운영 게시판 조회 실패', async () => {
+      jest.spyOn(service, 'findAll').mockResolvedValue(null);
+      const posts = await service.findAll(1, POST_TYPE_ENUM.FREE);
+      expect(posts).toBe(null);
+    });
+  });
+
+  describe('게시글 목록 조회 (관리자 권한)', () => {
+    it('자유 게시판 조회 성공', async () => {
+      jest.spyOn(service, 'findAll').mockResolvedValue(findOneResponses);
+      const posts = await service.findAll(1, POST_TYPE_ENUM.FREE);
+      expect(posts).toBe(findOneResponses);
+    });
+
+    it('공지 게시판 조회 성공', async () => {
+      jest.spyOn(service, 'findAll').mockResolvedValue(findOneResponses);
+      const posts = await service.findAll(1, POST_TYPE_ENUM.FREE);
+      expect(posts).toBe(findOneResponses);
+    });
+
+    it('운영 게시판 조회 성공', async () => {
+      jest.spyOn(service, 'findAll').mockResolvedValue(findOneResponses);
+      const posts = await service.findAll(1, POST_TYPE_ENUM.FREE);
+      expect(posts).toBe(findOneResponses);
     });
   });
 });
