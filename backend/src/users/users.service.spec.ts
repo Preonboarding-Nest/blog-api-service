@@ -1,9 +1,9 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { RedisService } from 'src/redis/redis.service';
-import { FindRelationsNotFoundError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GENDER_ENUM } from './entities/enums';
 import { User } from './entities/user.entity';
@@ -16,7 +16,7 @@ const mockUserRepository = () => {
     create: jest.fn().mockImplementation((user) => user),
     save: jest.fn().mockImplementation((user) => {
       user.id = Math.random();
-      user.isDeleted = false;
+      user.isDeleted = user.isDeleted ? user.isDeleted : false;
       users.push(user);
       return user;
     }),
@@ -47,7 +47,9 @@ const mockUserRepository = () => {
   };
 };
 
-const mockAuthService = () => ({});
+const mockAuthService = () => ({
+  logout: jest.fn(),
+});
 const mockRedisService = () => ({
   delKey: jest.fn(),
 });
@@ -83,34 +85,26 @@ describe('UsersService', () => {
     jest.clearAllMocks();
   });
 
+  const password = 'tester123!';
+  const userInfo: CreateUserDto = {
+    email: 'test@test.com',
+    password,
+    phone: '01012341234',
+    age: 28,
+    gender: GENDER_ENUM.MALE,
+  };
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
   it('creates a new user with a salted and hashed password', async () => {
-    const password = 'tester123!';
-    const userInfo: CreateUserDto = {
-      email: 'test@test.com',
-      password,
-      phone: '01012341234',
-      age: 28,
-      gender: GENDER_ENUM.MALE,
-    };
     const user = await service.createUser(userInfo);
 
     expect(user.password).not.toEqual(password);
   });
 
   it('throws an exception if user tries to create a new user with email that is in use', async () => {
-    const password = 'tester123!';
-    const userInfo: CreateUserDto = {
-      email: 'test@test.com',
-      password,
-      phone: '01012341234',
-      age: 28,
-      gender: GENDER_ENUM.MALE,
-    };
-
     await service.createUser(userInfo);
 
     await expect(service.createUser(userInfo)).rejects.toBeInstanceOf(
@@ -119,20 +113,32 @@ describe('UsersService', () => {
   });
 
   it('returns a user with a given id.', async () => {
-    const password = 'tester123!';
-    const userInfo: CreateUserDto = {
-      email: 'test@test.com',
-      password,
-      phone: '01012341234',
-      age: 28,
-      gender: GENDER_ENUM.MALE,
-    };
-
     const { id } = await service.createUser(userInfo);
 
     const user = await service.findUserById(id);
 
     expect(user).toBeDefined();
     expect(user.id).toEqual(id);
+  });
+
+  it('throws exception if user tries to find a user with nonexisitng id.', async () => {
+    await expect(service.findUserById(9999)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
+  it('throws exception if user tries to fidn a deleted user.', async () => {
+    const { id } = await service.createUser(userInfo);
+    await service.removeUserById(id);
+
+    await expect(service.findUserById(id)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
+  it('thows exception if user tries to delete a user with nonexisting id.', async () => {
+    await expect(service.removeUserById(9999)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 });
