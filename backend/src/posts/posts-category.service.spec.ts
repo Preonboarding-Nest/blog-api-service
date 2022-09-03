@@ -69,4 +69,12 @@ describe('PostsCategoryService', () => {
 
     expect(postCategory.type).toEqual(type);
   });
+
+  it('throws exception if user tries to create a new post category whose type is already exists.', async () => {
+    await service.createPostCategory({ type });
+
+    await expect(service.createPostCategory({ type })).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+  });
 });
