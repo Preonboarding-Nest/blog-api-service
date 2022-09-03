@@ -7,13 +7,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
 } from 'typeorm';
+import { PostCategory } from './post-category.entity';
 
 @Entity()
 export class Post {
-  constructor(title: string, content: string) {
-    this.title = title;
-    this.content = content;
-  }
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -52,4 +49,7 @@ export class Post {
 
   @ManyToOne(() => User, (user) => user.posts)
   user: User;
+
+  @ManyToOne(() => PostCategory, (postCategory) => postCategory.posts)
+  postCategory: PostCategory;
 }
