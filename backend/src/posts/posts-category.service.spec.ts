@@ -35,6 +35,14 @@ const mockPostCategoryRepository = () => {
         });
       }
 
+      if (where.id) {
+        categories.forEach((category) => {
+          if (category.id === where.id) {
+            existingPostCategory = category;
+          }
+        });
+      }
+
       return existingPostCategory;
     }),
     remove: jest.fn(),
@@ -93,5 +101,17 @@ describe('PostsCategoryService', () => {
     await expect(
       service.updatePostCategory(9999, { type: 'New' }),
     ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('should update a post category', async () => {
+    const postCategory = await service.createPostCategory({ type });
+
+    console.log(postCategory);
+    const updatedPostCategory = await service.updatePostCategory(
+      postCategory.id,
+      { type: 'Updated' },
+    );
+
+    expect(updatedPostCategory.type).toEqual('Updated');
   });
 });
