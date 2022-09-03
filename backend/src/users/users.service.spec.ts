@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { RedisService } from 'src/redis/redis.service';
-import { Repository } from 'typeorm';
+import { FindRelationsNotFoundError, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GENDER_ENUM } from './entities/enums';
 import { User } from './entities/user.entity';
@@ -15,8 +15,9 @@ const mockUserRepository = () => {
   return {
     create: jest.fn().mockImplementation((user) => user),
     save: jest.fn().mockImplementation((user) => {
+      user.id = Math.random();
+      user.isDeleted = false;
       users.push(user);
-      console.log('users', users);
       return user;
     }),
     find: jest.fn(),
@@ -26,10 +27,16 @@ const mockUserRepository = () => {
       let existingUser: User;
 
       if (where.email) {
-        console.log(where.email);
         users.forEach((user) => {
           if (user.email === where.email) {
-            console.log('match');
+            existingUser = user;
+          }
+        });
+      }
+
+      if (where.id) {
+        users.forEach((user) => {
+          if (user.id === where.id) {
             existingUser = user;
           }
         });
@@ -81,8 +88,6 @@ describe('UsersService', () => {
   });
 
   it('creates a new user with a salted and hashed password', async () => {
-    const users: User[] = [];
-
     const password = 'tester123!';
     const userInfo: CreateUserDto = {
       email: 'test@test.com',
@@ -106,12 +111,28 @@ describe('UsersService', () => {
       gender: GENDER_ENUM.MALE,
     };
 
-    const user = await service.createUser(userInfo);
-
-    console.log(user);
+    await service.createUser(userInfo);
 
     await expect(service.createUser(userInfo)).rejects.toBeInstanceOf(
       BadRequestException,
     );
+  });
+
+  it('returns a user with a given id.', async () => {
+    const password = 'tester123!';
+    const userInfo: CreateUserDto = {
+      email: 'test@test.com',
+      password,
+      phone: '01012341234',
+      age: 28,
+      gender: GENDER_ENUM.MALE,
+    };
+
+    const { id } = await service.createUser(userInfo);
+
+    const user = await service.findUserById(id);
+
+    expect(user).toBeDefined();
+    expect(user.id).toEqual(id);
   });
 });
