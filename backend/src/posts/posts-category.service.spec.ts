@@ -45,7 +45,15 @@ const mockPostCategoryRepository = () => {
 
       return existingPostCategory;
     }),
-    remove: jest.fn(),
+    remove: jest.fn().mockImplementation((category) => {
+      const index = categories.findIndex((c, index) => {
+        if (c.id === category.id) {
+          return true;
+        }
+      });
+
+      categories.splice(index, 1);
+    }),
   };
 };
 
@@ -106,7 +114,6 @@ describe('PostsCategoryService', () => {
   it('should update a post category', async () => {
     const postCategory = await service.createPostCategory({ type });
 
-    console.log(postCategory);
     const updatedPostCategory = await service.updatePostCategory(
       postCategory.id,
       { type: 'Updated' },
@@ -119,5 +126,16 @@ describe('PostsCategoryService', () => {
     await expect(service.deletePostCategory(9999)).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  it('should delete a post category with a given id', async () => {
+    const { id } = await service.createPostCategory({ type });
+
+    const categoriesBeforeDelete = await service.findAllPostCategories();
+    expect(categoriesBeforeDelete.length).toEqual(1);
+
+    await service.deletePostCategory(id);
+    const categories = await service.findAllPostCategories();
+    expect(categories.length).toEqual(0);
   });
 });
