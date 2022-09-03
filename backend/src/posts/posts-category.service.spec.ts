@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -87,5 +87,11 @@ describe('PostsCategoryService', () => {
 
     const categories = await service.findAllPostCategories();
     expect(categories).toHaveLength(3);
+  });
+
+  it('throws exception if user tries to updte a non-existing post', async () => {
+    await expect(
+      service.updatePostCategory(9999, { type: 'New' }),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 });
