@@ -19,7 +19,9 @@ const mockPostCategoryRepository = () => {
       categories.push(category);
       return category;
     }),
-    find: jest.fn(),
+    find: jest.fn().mockImplementation(() => {
+      return categories;
+    }),
     findOne: jest.fn().mockImplementation((query) => {
       const where = query.where;
 
@@ -76,5 +78,14 @@ describe('PostsCategoryService', () => {
     await expect(service.createPostCategory({ type })).rejects.toBeInstanceOf(
       BadRequestException,
     );
+  });
+
+  it('should return post categories list', async () => {
+    await service.createPostCategory({ type: '자유게시판' });
+    await service.createPostCategory({ type: '공지사항' });
+    await service.createPostCategory({ type: '운영게시판' });
+
+    const categories = await service.findAllPostCategories();
+    expect(categories).toHaveLength(3);
   });
 });
