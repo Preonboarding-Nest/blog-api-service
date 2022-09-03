@@ -114,4 +114,10 @@ describe('PostsCategoryService', () => {
 
     expect(updatedPostCategory.type).toEqual('Updated');
   });
+
+  it('throws exception if user tries to delete non-existing post category.', async () => {
+    await expect(service.deletePostCategory(9999)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
 });
