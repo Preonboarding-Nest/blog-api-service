@@ -10,12 +10,10 @@ import { POST_TYPE_ENUM } from 'src/commons/enums/commons.enums';
 import { HttpStatus } from '@nestjs/common';
 import { FindPostResponseDto } from './dto/find-post.dto';
 
-//type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 describe('PostsService', () => {
   let service: PostsService;
   let userRepository: Repository<User>;
-  // let userRepository: MockRepository<User>;
 
   // (1)
   const mockPostRepository = () => ({
