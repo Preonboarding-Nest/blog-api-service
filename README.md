@@ -126,10 +126,24 @@ project/
 ├─ main.ts
 ```
 
-users, posts, auth, statistics 폴더를 다누고, DTO 및 Entity를 작성하여 테이블 생성
-각 폴더에 module, controller, service, dto, entity 가 정의되어 있음
-각 module Emfdmf app.module에서 통합 
+users, posts, auth, statistics 폴더를 다누고, DTO 및 Entity를 작성하여 테이블 생성  
+각 폴더에 module, controller, service, dto, entity 가 정의되어 있음  
+각 module Emfdmf app.module에서 통합  
+  
+commons :  
+database:  
+filters:  
+interceptors:  
+redis:  
 
 
 
 ## API 구현 
+### controller 구현
+
+### service 구현
+
+### gurad 구현
+
+### interceptor 구현
+
