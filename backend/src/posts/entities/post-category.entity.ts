@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Post } from './post.entity';
 
 @Entity()
 export class PostCategory {
@@ -12,4 +13,7 @@ export class PostCategory {
     unique: true,
   })
   type: string;
+
+  @OneToMany(() => Post, (post) => post.postCategory)
+  posts: Post[];
 }
