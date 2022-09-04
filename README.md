@@ -59,16 +59,34 @@
     - 회원가입 수
     - 회원탈퇴 수
     
-    
-# 테스트 방법 
-실행:
-
 
 
 # 사용 예제  (api doc ?)
-## 회원 
+## 1. 회원 
+### 1.1 회원 등록(POST)
 
-## 게시판 / 게시글 
+### 1.2 회원 조회(GET)
+
+### 1.3 회원 삭제(DELETE)
+
+### 1.5 로그인(POST)
+
+### 1.6 로그아웃(POST)
+
+### 1.7 Token refresh()
+
+
+## 2. 게시판 / 게시글 
+### 2.1 게시판 등록(POST)
+
+### 2.2 게시판 목록 조회(GET)
+
+### 2.3 게시판 수정(PATCH)
+
+### 2.4 게시판 삭제(DELETE)
+
+### 2.5 게시글 ~ 
+
 
 ## 통계
 
@@ -79,8 +97,9 @@
 
 데이터베이스 생성(AWS RDS): PostgredSQL
 
-데이터베이스 연결 및 TypeORM Entity 생성 
-// 테이블 이미지 
+데이터베이스 연결 및 모델링
+
+![모델링](https://user-images.githubusercontent.com/63445753/188299953-62432aae-8f5d-4876-8b26-0169015c05cf.png) 
 
 
 모델링 주요 이슈 
@@ -89,6 +108,28 @@
 3.
 
 폴더 구조
-... 
+```
+project/
+├─ src/
+│  ├─ users/
+│  ├─ posts/
+│  ├─ auth/
+│  ├─ statistics/
+│  ├─ commons/
+│  ├─ database/
+│  ├─ filters/
+│  ├─ interceptors/
+│  ├─ redis/
+├─ app.controller.ts
+├─ app.module.ts
+├─ app.service.ts
+├─ main.ts
+```
+
+users, posts, auth, statistics 폴더를 다누고, DTO 및 Entity를 작성하여 테이블 생성
+각 폴더에 module, controller, service, dto, entity 가 정의되어 있음
+각 module Emfdmf app.module에서 통합 
+
+
 
 ## API 구현 
