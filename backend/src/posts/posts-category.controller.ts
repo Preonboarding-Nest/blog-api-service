@@ -19,9 +19,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { API_METHOD, API_RESOURCE, EVENTS } from 'src/commons/constants';
-import { GetCurrentUserId } from 'src/commons/decorators';
-import { StatisticsSaveEvent } from 'src/statistics/events/statistics-save.event';
+import { API_METHOD, API_RESOURCE, EVENTS } from '../commons/constants';
+import { GetCurrentUserId } from '../commons/decorators';
+import { StatisticsSaveEvent } from '../statistics/events/statistics-save.event';
 import { CreatePostCategoryDto } from './dto/create-postCategory.dto';
 import { UpdatePostCategoryDto } from './dto/update-postCategory.dto';
 import { PostCategory } from './entities/post-category.entity';
