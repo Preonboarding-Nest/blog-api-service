@@ -93,6 +93,13 @@
 
 
 # 구현 과정 
+
+## 기술 스택 
+- Framework: NestJS
+- Database: AWS RDS - postgres
+- ORM: TypeORM 
+
+
 ## 환경 세팅
 
 데이터베이스 생성(AWS RDS): PostgredSQL
@@ -146,4 +153,33 @@ redis:
 ### gurad 구현
 
 ### interceptor 구현
+
+# 테스트 
+
+## User Service Unit 테스트 
+- createUser
+  - user 생성 여부 검증
+  - email 중복시 BadRequestException 검증
+- findUserById
+  - user 조회 검증
+  - 존재하지 않는 user 조회시 NotFoundException 검증
+  - 삭제된 user 조회시 NotFoundException 검증
+- removeUserById
+  - user 삭제 검증 (= 삭제된 user 조회시 NotFoundException 검증)
+  - 존재하지 않는 user 삭제시 NotFoundException 검증
+  
+
+![User service unit test result](https://user-images.githubusercontent.com/63445753/188340934-4e9e3569-4eb8-4f8b-a064-0ca4e8e91b38.png)
+
+
+## ~~ Unit 테스트 
+...
+
+
+# 서비스 배포  
+## 배포 환경 
+// 환경 설명
+
+## 서비스 캡쳐 사진 
+// 이미지 
 
