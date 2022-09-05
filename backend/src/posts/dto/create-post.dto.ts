@@ -14,12 +14,4 @@ export class CreatePostDto {
   @IsString()
   @IsNotEmpty()
   content: string;
-
-  toEntity(postCategory: PostCategory) {
-    const post = new Post();
-    post.title = this.title;
-    post.content = this.content;
-    post.postCategory = postCategory;
-    return post;
-  }
 }
