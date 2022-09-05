@@ -156,7 +156,10 @@ redis:
 
 # 테스트 
 
-## User Service Unit 테스트 
+## User Service Unit 테스트  
+
+### 테스트 내용
+
 - createUser
   - user 생성 여부 검증
   - email 중복시 BadRequestException 검증
