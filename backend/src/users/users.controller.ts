@@ -12,7 +12,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, CreateUserResponseDto } from './dto/create-user.dto';
 import {
   ApiCookieAuth,
   ApiCreatedResponse,
@@ -26,6 +26,8 @@ import { Response } from 'express';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { API_METHOD, API_RESOURCE, EVENTS } from '../commons/constants';
 import { StatisticsSaveEvent } from '../statistics/events/statistics-save.event';
+import { Serialize } from '../interceptors/serialize.interceptor';
+
 
 @Controller('users')
 @ApiTags('Users API')
@@ -36,6 +38,7 @@ export class UsersController {
   ) {}
 
   @Post()
+  @Serialize(CreateUserResponseDto)
   @ApiOperation({ summary: '유저 생성 API', description: '유저를 생성합니다.' })
   @ApiCreatedResponse({ description: '유저를 생성합니다.', type: User })
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -50,6 +53,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @Serialize(CreateUserResponseDto)
   @ApiOperation({ summary: '유저 조회 API', description: '유저를 조회합니다.' })
   @ApiCreatedResponse({ description: '유저를 조회합니다.', type: User })
   async findOneUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
