@@ -16,7 +16,14 @@ import { TERM_ENUM } from '../commons/enums/commons.enums';
 import * as dayjs from 'dayjs';
 
 @Injectable()
+/**
+ * 이 클래스는 Statistics Service를 정의합니다.
+ */
 export class StatisticsService {
+  /**
+   * @param dataSource Datasource 인스턴스
+   * @param usersSerive Users Serive 인스턴스
+   */
   constructor(
     @InjectRepository(Statistic)
     private readonly dataSource: DataSource,
@@ -24,6 +31,11 @@ export class StatisticsService {
     private readonly usersSerive: UsersService,
   ) {}
 
+  /**
+   * 통계 정보를 조회합니다.
+   * @param findStatisticsDto 통계 조회를 위한 데이터
+   * @returns 조회된 통계 정보를 반환합니다.
+   */
   async find(
     findStatisticsDto: FindStatisticsDto,
   ): Promise<FindStatisticResult[]> {
