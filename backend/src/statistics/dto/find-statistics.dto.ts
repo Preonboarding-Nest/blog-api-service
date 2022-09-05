@@ -10,7 +10,17 @@ export class FindStatisticsDto {
   ageFrom: string;
   ageTo: string;
   userRole: ROLE_ENUM;
-  termUnit: string;
   term: TERM_ENUM;
+  termUnit: string;
   currentUserId: number;
+}
+
+export class FindStatisticResult {
+  startTime: string;
+  endTime: string;
+  count: number;
+}
+
+export class FindStatisticResults {
+  results: FindStatisticResult[];
 }
