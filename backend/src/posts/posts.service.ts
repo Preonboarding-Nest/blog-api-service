@@ -36,7 +36,7 @@ export class PostsService {
   async create(
     currentUserId: number,
     createPostDto: CreatePostDto,
-  ): Promise<number> {
+  ): Promise<{ id: number; type: number }> {
     const post = new Post();
     const categoryId = createPostDto.categoryId;
     const currentUser = await this.userRepository.findOne({
@@ -72,7 +72,10 @@ export class PostsService {
     post.user = currentUser;
 
     const savedPost = await this.postRepository.save(post);
-    return savedPost.id;
+    return {
+      id: savedPost.id,
+      type: savedPost.postCategory.id,
+    };
   }
 
   async findAll(

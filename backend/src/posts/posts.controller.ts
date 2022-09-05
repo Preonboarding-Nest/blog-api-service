@@ -22,11 +22,18 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { GetCurrentUserId } from '../commons/decorators';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { POST_TYPE_ENUM } from '../commons/enums/commons.enums';
+import { API_METHOD, API_RESOURCE, EVENTS } from '../commons/constants';
+import { StatisticsSaveEvent } from '../statistics/events/statistics-save.event';
 
 @Controller('posts')
 @ApiTags('Posts API')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   @ApiOperation({ summary: '게시글 등록 API' })
   @ApiResponse({
@@ -37,11 +44,28 @@ export class PostsController {
   @ApiCookieAuth('refreshToken')
   @ApiCookieAuth('accessToken')
   @Post()
-  create(
+  async create(
     @Body() createPostDto: CreatePostDto,
     @GetCurrentUserId() currentUserId: number,
   ): Promise<number> {
-    return this.postsService.create(currentUserId, createPostDto);
+    const result = await this.postsService.create(currentUserId, createPostDto);
+    let API_RESOURCE_POST = null;
+    if (result.type === POST_TYPE_ENUM.FREE) {
+      API_RESOURCE_POST = API_RESOURCE.POST._FREE;
+    } else if (result.type === POST_TYPE_ENUM.NOTICE) {
+      API_RESOURCE_POST = API_RESOURCE.POST._NOTICE;
+    } else if (result.type === POST_TYPE_ENUM.PROD) {
+      API_RESOURCE_POST = API_RESOURCE.POST._OPERATE;
+    }
+    this.eventEmitter.emit(
+      EVENTS.STATISTICS_SAVE,
+      new StatisticsSaveEvent(
+        API_RESOURCE_POST,
+        API_METHOD.POST,
+        currentUserId,
+      ),
+    );
+    return result.id;
   }
 
   @ApiOperation({ summary: '게시글 목록 조회 API' })
