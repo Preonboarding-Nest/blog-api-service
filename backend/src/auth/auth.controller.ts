@@ -72,7 +72,7 @@ export class AuthController {
 
     this.eventEmitter.emit(
       EVENTS.STATISTICS_SAVE,
-      new StatisticsSaveEvent(API_RESOURCE.USER._, API_METHOD.POST),
+      new StatisticsSaveEvent(API_RESOURCE.AUTH._LOGIN, API_METHOD.POST),
     );
 
     this.logger.verbose(`login success!`);
@@ -115,11 +115,6 @@ export class AuthController {
     } catch (error) {
       throw new ForbiddenException('cookie access Failed!');
     }
-
-    this.eventEmitter.emit(
-      EVENTS.STATISTICS_SAVE,
-      new StatisticsSaveEvent(API_RESOURCE.USER._, API_METHOD.POST, id),
-    );
   }
 
   @HttpCode(200)
@@ -148,10 +143,5 @@ export class AuthController {
     } catch (error) {
       throw new ForbiddenException('cookie access Failed!');
     }
-
-    this.eventEmitter.emit(
-      EVENTS.STATISTICS_SAVE,
-      new StatisticsSaveEvent(API_RESOURCE.USER._, API_METHOD.GET, id),
-    );
   }
 }
