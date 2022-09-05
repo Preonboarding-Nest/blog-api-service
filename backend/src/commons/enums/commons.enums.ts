@@ -8,3 +8,16 @@ export enum POST_TYPE_ENUM {
   NOTICE = 2,
   PROD = 3,
 }
+
+/**
+ * 정리
+ * 년 월 일 시 분 초
+ */
+export enum TERM_ENUM {
+  YEAR = 'year',
+  MONTH = 'month',
+  DATE = 'date',
+  HOUR = 'hour',
+  MIN = 'min',
+  SEC = 'sec',
+}

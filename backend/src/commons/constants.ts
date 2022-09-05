@@ -13,6 +13,10 @@ export const API_METHOD = {
 };
 
 export const API_RESOURCE = {
+  AUTH: {
+    _LOGIN: 'auth_login',
+    _TOKEN: 'auth_token',
+  },
   USER: {
     _: 'user',
   },
@@ -23,6 +27,6 @@ export const API_RESOURCE = {
     _OPERATE: 'post_operate',
   },
   POST_CATEGORY: {
-    _: '_post_category',
+    _: 'post_category',
   },
 };
