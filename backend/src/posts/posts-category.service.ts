@@ -1,9 +1,9 @@
 import {
   BadRequestException,
   Injectable,
-  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePostCategoryDto } from './dto/create-postCategory.dto';
@@ -15,6 +15,7 @@ export class PostsCategoryService {
   constructor(
     @InjectRepository(PostCategory)
     private postCategoryRepository: Repository<PostCategory>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async createPostCategory(
@@ -31,11 +32,16 @@ export class PostsCategoryService {
 
     const postCategory = await this.postCategoryRepository.create({ type });
 
-    return await this.postCategoryRepository.save(postCategory);
+    const retrievedCategory = await this.postCategoryRepository.save(
+      postCategory,
+    );
+
+    return retrievedCategory;
   }
 
   async findAllPostCategories(): Promise<PostCategory[]> {
     const postCategories = await this.postCategoryRepository.find();
+
     return postCategories;
   }
 
