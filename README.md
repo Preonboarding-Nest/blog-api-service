@@ -166,7 +166,23 @@ project/
   - 존재하지 않는 user 삭제시 NotFoundException 검증
 
 #### Auth service
-...
+findUser
+  - return user by email
+  - return 404 error for finding user by email
+  - return user by id
+  - return 404 error for finding user by id
+login
+  - return tokens by email and id
+  - return 401 error not making tokens
+  - login success
+  - return 404 error not existing user
+  - return 404 error
+logout
+  - return true by id and logout
+  - return 404 error not removing rt to redis
+token
+  - return accesstoken by id and refresh
+  - return 404 error not getting rt to redis
 
   
 ### 테스트 결과
