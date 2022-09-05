@@ -1,28 +1,45 @@
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { RedisModule } from 'src/redis/redis.module';
 import { RedisService } from 'src/redis/redis.service';
-import { GENDER_ENUM, ROLE_ENUM } from 'src/users/entities/enums';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto';
 import { Tokens } from './types';
 
+const userEntity = new User();
+const tokens: Tokens = {
+  accessToken: 'testAccessToken',
+  refreshToken: 'testRefreshToken',
+};
+const loginDto = new LoginDto();
+
 const mockUserRepository = () => ({
-  findOne: jest.fn(),
+  findOne: jest.fn().mockImplementationOnce(() => {
+    throw new NotFoundException();
+  }),
 });
 
 const mockJwtRepository = () => ({
-  signAsyn: jest.fn(),
+  signAsyn: jest.fn().mockImplementationOnce(() => {
+    throw new UnauthorizedException();
+  }),
 });
 
 const mockRedisRepository = () => ({
-  delKey: jest.fn(),
-  setKey: jest.fn(),
-  getKey: jest.fn(),
+  delKey: jest.fn().mockImplementationOnce(() => {
+    throw new NotFoundException();
+  }),
+  setKey: jest.fn().mockImplementationOnce(() => {
+    throw new NotFoundException();
+  }),
+  getKey: jest.fn().mockImplementationOnce(() => {
+    throw new NotFoundException();
+  }),
 });
 
 describe('AuthService', () => {
@@ -55,75 +72,42 @@ describe('AuthService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(userRepository).toBeDefined();
   });
-
-  const res = {
-    status: jest.fn(() => res),
-  };
-
-  const userDummy: User = {
-    id: 5,
-    email: 'test@email.com',
-    password: 'tester1234',
-    gender: GENDER_ENUM.FEMALE,
-    age: 25,
-    phone: '01000000000',
-    createdAt: new Date('2022-08-31 11:22:11.876'),
-    updatedAt: new Date('2022-08-31 11:22:11.876'),
-    lastAccessedAt: new Date('2022-08-31 11:22:11.876'),
-    isDeleted: false,
-    role: ROLE_ENUM.USER,
-    posts: [],
-  };
-
-  const tokens: Tokens = {
-    accessToken: 'testAccessToken',
-    refreshToken: 'testRefreshToken',
-  };
 
   describe('findUser', () => {
     it('return user by email', async () => {
       const userSpy = jest
         .spyOn(service, 'findUserByEmail')
-        .mockResolvedValue(userDummy);
+        .mockResolvedValue(userEntity);
 
-      const user = await service.findUserByEmail(userDummy.email);
-      res.status.mockReturnValue(200);
+      const user = await service.findUserByEmail(userEntity.email);
 
-      expect(userSpy).toHaveBeenCalledWith('test@email.com');
-      expect(user).toEqual(userDummy);
-      expect(res.status()).toBe(200);
+      expect(userSpy).toHaveBeenCalledWith(userEntity.email);
+      expect(user).toEqual(userEntity);
     });
 
     it('return 404 error for finding user by email', async () => {
-      jest.spyOn(service, 'findUserByEmail').mockResolvedValue(userDummy);
-
-      await service.findUserByEmail(userDummy.email);
-      res.status.mockReturnValue(404);
-
-      expect(res.status()).toBe(404);
+      await expect(service.findUserByEmail(userEntity.email)).rejects.toThrow(
+        new NotFoundException('회원 정보를 조회하지 못했습니다.'),
+      );
     });
 
     it('return user by id', async () => {
       const userSpy = jest
         .spyOn(service, 'findUserById')
-        .mockResolvedValue(userDummy);
+        .mockResolvedValue(userEntity);
 
-      const user = await service.findUserById(userDummy.id);
-      res.status.mockReturnValue(200);
+      const user = await service.findUserById(userEntity.id);
 
-      expect(userSpy).toHaveBeenCalledWith(5);
-      expect(user).toEqual(userDummy);
-      expect(res.status()).toBe(200);
+      expect(userSpy).toHaveBeenCalledWith(userEntity.id);
+      expect(user).toEqual(userEntity);
     });
 
     it('return 404 error for finding user by id', async () => {
-      jest.spyOn(service, 'findUserById').mockResolvedValue(userDummy);
-
-      await service.findUserById(userDummy.id);
-      res.status.mockReturnValue(404);
-
-      expect(res.status()).toBe(404);
+      await expect(service.findUserById(userEntity.id)).rejects.toThrow(
+        new NotFoundException('회원 정보를 조회하지 못했습니다.'),
+      );
     });
   });
 
@@ -133,49 +117,75 @@ describe('AuthService', () => {
         .spyOn(service, 'makeTokens')
         .mockResolvedValue(tokens);
 
-      const user = await service.makeTokens('test@email.com', 5);
-      res.status.mockReturnValue(200);
+      const user = await service.makeTokens(userEntity.email, userEntity.id);
 
-      expect(userSpy).toHaveBeenCalledWith('test@email.com', 5);
+      expect(userSpy).toHaveBeenCalledWith(userEntity.email, userEntity.id);
       expect(user).toEqual(tokens);
-      expect(res.status()).toBe(200);
     });
 
-    it('return 401 error for making tokens', async () => {
-      jest.spyOn(service, 'makeTokens').mockResolvedValue(tokens);
-
-      await service.makeTokens('test@email.com', 5);
-      res.status.mockReturnValue(401);
-
-      expect(res.status()).toBe(401);
+    it('return 401 error not making tokens', async () => {
+      await expect(
+        service.makeTokens(userEntity.email, userEntity.id),
+      ).rejects.toThrow(
+        new UnauthorizedException('토큰을 생성하지 못했습니다.'),
+      );
     });
 
     it('login success', async () => {
-      const dto = new LoginDto();
-
       const userSpy = jest
         .spyOn(service, 'login')
-        .mockResolvedValue({ user: userDummy, tokens });
+        .mockResolvedValue({ user: userEntity, tokens });
 
-      const user = await service.login(dto);
-      res.status.mockReturnValue(200);
+      const user = await service.login(loginDto);
 
-      expect(userSpy).toHaveBeenCalledWith(dto);
-      expect(user).toEqual({ user: userDummy, tokens });
-      expect(res.status()).toBe(200);
+      expect(userSpy).toHaveBeenCalledWith(loginDto);
+      expect(user).toEqual({ user: userEntity, tokens });
     });
 
-    it('login failed', async () => {
-      const dto = new LoginDto();
+    it('return 404 error not existing user', async () => {
+      await expect(service.login(loginDto)).rejects.toThrow(
+        new NotFoundException('회원 정보를 조회하지 못했습니다.'),
+      );
+    });
 
-      jest
-        .spyOn(service, 'login')
-        .mockResolvedValue({ user: userDummy, tokens });
+    it('return 404 error', async () => {
+      await expect(
+        service.login({ email: 'email', password: 'password' }),
+      ).rejects.toThrow(
+        new NotFoundException('회원 정보를 조회하지 못했습니다.'),
+      );
+    });
+  });
 
-      await service.login(dto);
-      res.status.mockReturnValue(401);
+  describe('logout', () => {
+    it('return true by id and logout', async () => {
+      const userSpy = jest.spyOn(service, 'logout').mockResolvedValue(true);
 
-      expect(res.status()).toBe(401);
+      const user = await service.logout(userEntity.id);
+
+      expect(userSpy).toHaveBeenCalledWith(userEntity.id);
+      expect(user).toEqual(true);
+    });
+
+    it('return 404 error not removing rt to redis', async () => {
+      await expect(service.logout(5)).rejects.toThrow(new NotFoundException());
+    });
+  });
+
+  describe('token', () => {
+    it('return accesstoken by id and refresh', async () => {
+      const userSpy = jest
+        .spyOn(service, 'token')
+        .mockResolvedValue(tokens.accessToken);
+
+      const user = await service.token(userEntity.id);
+
+      expect(userSpy).toHaveBeenCalledWith(userEntity.id);
+      expect(user).toEqual(tokens.accessToken);
+    });
+
+    it('return 404 error not getting rt to redis', async () => {
+      await expect(service.token(5)).rejects.toThrow(new NotFoundException());
     });
   });
 });
