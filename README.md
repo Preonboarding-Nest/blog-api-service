@@ -156,9 +156,9 @@ redis:
 
 # 테스트 
 
-## User Service Unit 테스트  
+### 테스트 커버리지
 
-### 테스트 내용
+#### Users service
 
 - createUser
   - user 생성 여부 검증
@@ -170,14 +170,18 @@ redis:
 - removeUserById
   - user 삭제 검증 (= 삭제된 user 조회시 NotFoundException 검증)
   - 존재하지 않는 user 삭제시 NotFoundException 검증
+
+#### Auth service
+...
+
   
+### 테스트 결과
+
+#### Users service
 
 ![User service unit test result](https://user-images.githubusercontent.com/63445753/188340934-4e9e3569-4eb8-4f8b-a064-0ca4e8e91b38.png)
 
-
-## ~~ Unit 테스트 
-...
-
+#### Auth Service
 
 # 서비스 배포  
 ## 배포 환경 
