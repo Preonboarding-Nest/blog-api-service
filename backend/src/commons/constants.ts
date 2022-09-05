@@ -23,6 +23,6 @@ export const API_RESOURCE = {
     _OPERATE: 'post_operate',
   },
   POST_CATEGORY: {
-    _: '_post_category',
+    _: 'post_category',
   },
 };
