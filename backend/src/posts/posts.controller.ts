@@ -67,7 +67,9 @@ export class PostsController {
     @GetCurrentUserId() currentUserId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,
   ): Promise<FindPostResponseDto[]> {
-    return await this.postsService.findAll(currentUserId, categoryId);
+    const result = await this.postsService.findAll(currentUserId, categoryId);
+    this.emitPostStatisticsEvent(API_METHOD.GETS, currentUserId, result.type);
+    return result.posts;
   }
 
   @ApiOperation({ summary: '게시글 상세 조회 API' })

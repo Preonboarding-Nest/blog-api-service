@@ -81,7 +81,7 @@ export class PostsService {
   async findAll(
     currentUserId: number,
     categoryId: number,
-  ): Promise<FindPostResponseDto[]> {
+  ): Promise<{ posts: FindPostResponseDto[]; type: number }> {
     const currentUser = await this.userRepository.findOne({
       where: { id: currentUserId, isDeleted: false },
     });
@@ -107,7 +107,10 @@ export class PostsService {
       relations: ['user'],
     });
 
-    return posts.map((p) => new FindPostResponseDto().of(p));
+    return {
+      posts: posts.map((p) => new FindPostResponseDto().of(p)),
+      type: postCategory.id,
+    };
   }
 
   async findOne(
