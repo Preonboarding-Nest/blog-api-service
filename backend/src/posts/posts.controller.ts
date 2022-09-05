@@ -48,7 +48,12 @@ export class PostsController {
     @Body() createPostDto: CreatePostDto,
     @GetCurrentUserId() currentUserId: number,
   ): Promise<number> {
-    const result = await this.postsService.create(currentUserId, createPostDto);
+    let result;
+    try {
+      result = await this.postsService.create(currentUserId, createPostDto);
+    } catch (e) {
+      return e;
+    }
     this.emitPostStatisticsEvent(API_METHOD.POST, currentUserId, result.type);
     return result.id;
   }
@@ -67,7 +72,12 @@ export class PostsController {
     @GetCurrentUserId() currentUserId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,
   ): Promise<FindPostResponseDto[]> {
-    const result = await this.postsService.findAll(currentUserId, categoryId);
+    let result;
+    try {
+      result = await this.postsService.findAll(currentUserId, categoryId);
+    } catch (e) {
+      return e;
+    }
     this.emitPostStatisticsEvent(API_METHOD.GETS, currentUserId, result.type);
     return result.posts;
   }
@@ -87,11 +97,16 @@ export class PostsController {
     @Param('id', ParseIntPipe) postId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,
   ): Promise<FindPostResponseDto> {
-    const result = await this.postsService.findOne(
-      currentUserId,
-      postId,
-      categoryId,
-    );
+    let result;
+    try {
+      result = await this.postsService.findOne(
+        currentUserId,
+        postId,
+        categoryId,
+      );
+    } catch (e) {
+      return e;
+    }
     this.emitPostStatisticsEvent(API_METHOD.GET, currentUserId, result.type);
     return result.post;
   }
@@ -110,7 +125,12 @@ export class PostsController {
     @Param('id', ParseIntPipe) postId: number,
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<void> {
-    await this.postsService.update(currentUserId, postId, updatePostDto);
+    try {
+      await this.postsService.update(currentUserId, postId, updatePostDto);
+    } catch (e) {
+      return e;
+    }
+
     this.emitPostStatisticsEvent(API_METHOD.PATCH, currentUserId, null);
   }
 
@@ -127,7 +147,11 @@ export class PostsController {
     @GetCurrentUserId() currentUserId: number,
     @Param('id', ParseIntPipe) postId: number,
   ): Promise<void> {
-    await this.postsService.remove(currentUserId, postId);
+    try {
+      await this.postsService.remove(currentUserId, postId);
+    } catch (e) {
+      return e;
+    }
     this.emitPostStatisticsEvent(API_METHOD.DELETE, currentUserId, null);
   }
 
