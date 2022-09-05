@@ -91,6 +91,14 @@ swagger를 사용하여 제작한 API Docs
 
 ![모델링](https://user-images.githubusercontent.com/63445753/188299953-62432aae-8f5d-4876-8b26-0169015c05cf.png) 
 
+
+모델링 주요 이슈 
+1.
+
+2.
+
+3.
+
 ### 폴더 구조
 ```
 project/
@@ -189,6 +197,10 @@ token
 #### Auth Service
 
 ![image](https://user-images.githubusercontent.com/71163016/188348898-7a25c0a7-918c-4210-95c1-8abc6a9fcfd1.png)
+
+#### Posts Service
+![image](https://user-images.githubusercontent.com/81298415/188384988-66dbfd3c-f853-4dcd-85f2-7c0e894c2908.png)
+
 
 # 서비스 배포 
 
