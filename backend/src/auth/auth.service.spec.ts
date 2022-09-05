@@ -148,7 +148,7 @@ describe('AuthService', () => {
       );
     });
 
-    it('return 404 error not setting rt to redis', async () => {
+    it('return 404 error', async () => {
       await expect(
         service.login({ email: 'email', password: 'password' }),
       ).rejects.toThrow(
