@@ -9,7 +9,8 @@ export class FindStatisticsDto {
   gender: GENDER_ENUM;
   ageFrom: string;
   ageTo: string;
-  user_role: ROLE_ENUM;
+  userRole: ROLE_ENUM;
+  termUnit: string;
   term: TERM_ENUM;
   currentUserId: number;
 }
