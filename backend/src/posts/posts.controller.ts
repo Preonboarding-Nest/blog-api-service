@@ -155,6 +155,12 @@ export class PostsController {
     this.emitPostStatisticsEvent(API_METHOD.DELETE, currentUserId, null);
   }
 
+  /**
+   * 게시글 통계용 emit
+   * @param method API_METHOD 상수 값으로 API 메서드를 지정합니다.
+   * @param currentUserId 현재 로그인한 사용자의 id값을 지정합니다.
+   * @param postType POST_TYPE_ENUM으로 게시글 타입을 지정합니다.
+   */
   emitPostStatisticsEvent(
     method: string,
     currentUserId: number,
