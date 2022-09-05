@@ -94,7 +94,9 @@ swagger를 사용하여 제작한 API Docs
 
 모델링 주요 이슈 
 1.
+
 2.
+
 3.
 
 ### 폴더 구조
@@ -116,15 +118,19 @@ project/
 ├─ main.ts
 ```
 
-users, posts, auth, statistics 폴더를 다누고, DTO 및 Entity를 작성하여 테이블 생성  
+- users, posts, auth, statistics 폴더를 다누고, DTO 및 Entity를 작성하여 테이블 생성  
 각 폴더에 module, controller, service, dto, entity 가 정의되어 있음  
 각 module Emfdmf app.module에서 통합  
   
-commons : 모든 서비스에서 공용으로 사용하는 decorator, enum 등을 저장
-database: typeORM 설정
-filters: 예외 필터 적용
-interceptors: response type 적용
-redis: cache memory 연결
+- commons : 모든 서비스에서 공용으로 사용하는 decorator, enum 등을 저장
+
+- database: typeORM 설정
+
+- filters: 예외 필터 적용
+
+- interceptors: response type 적용
+
+- redis: cache memory 연결
 
 ## 역할 분담 🧑‍💻
 
@@ -134,16 +140,6 @@ redis: cache memory 연결
 | 박수정 | Auth API | 배포, Auth Service Unit Test |
 | 송하림 | Statistics | Response Format 적용 |
 | 인상운 | Post API | Post Service Unit Test |
-
-
-## API 구현 
-### controller 구현
-
-### service 구현
-
-### gurad 구현
-
-### interceptor 구현
 
 # 테스트 
 
