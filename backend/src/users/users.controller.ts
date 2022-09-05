@@ -61,6 +61,7 @@ export class UsersController {
     }
 
     try {
+      // 유저 삭제 시 Cookie에서 AccessToken 과 RefreshToken을 clear 합니다
       res.clearCookie('AccessToken');
       res.clearCookie('RefreshToken');
     } catch (error) {
