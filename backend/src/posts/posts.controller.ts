@@ -49,22 +49,7 @@ export class PostsController {
     @GetCurrentUserId() currentUserId: number,
   ): Promise<number> {
     const result = await this.postsService.create(currentUserId, createPostDto);
-    let API_RESOURCE_POST = null;
-    if (result.type === POST_TYPE_ENUM.FREE) {
-      API_RESOURCE_POST = API_RESOURCE.POST._FREE;
-    } else if (result.type === POST_TYPE_ENUM.NOTICE) {
-      API_RESOURCE_POST = API_RESOURCE.POST._NOTICE;
-    } else if (result.type === POST_TYPE_ENUM.PROD) {
-      API_RESOURCE_POST = API_RESOURCE.POST._OPERATE;
-    }
-    this.eventEmitter.emit(
-      EVENTS.STATISTICS_SAVE,
-      new StatisticsSaveEvent(
-        API_RESOURCE_POST,
-        API_METHOD.POST,
-        currentUserId,
-      ),
-    );
+    this.emitPostStatisticsEvent(API_METHOD.POST, currentUserId, result.type);
     return result.id;
   }
 
@@ -134,5 +119,21 @@ export class PostsController {
     @Param('id', ParseIntPipe) postId: number,
   ): Promise<void> {
     return await this.postsService.remove(currentUserId, postId);
+  }
+
+  emitPostStatisticsEvent(method, currentUserId, postType) {
+    let resource;
+    if (postType === POST_TYPE_ENUM.FREE) {
+      resource = API_RESOURCE.POST._FREE;
+    } else if (postType === POST_TYPE_ENUM.NOTICE) {
+      resource = API_RESOURCE.POST._NOTICE;
+    } else if (postType === POST_TYPE_ENUM.PROD) {
+      resource = API_RESOURCE.POST._OPERATE;
+    }
+
+    this.eventEmitter.emit(
+      EVENTS.STATISTICS_SAVE,
+      new StatisticsSaveEvent(resource, method, currentUserId),
+    );
   }
 }
