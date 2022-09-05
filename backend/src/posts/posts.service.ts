@@ -117,7 +117,7 @@ export class PostsService {
     currentUserId: number,
     postId: number,
     categoryId: number,
-  ): Promise<FindPostResponseDto> {
+  ): Promise<{ post: FindPostResponseDto; type: number }> {
     const currentUser = await this.userRepository.findOne({
       where: { id: currentUserId, isDeleted: false },
     });
@@ -146,7 +146,10 @@ export class PostsService {
       throw new ForbiddenException('운영 게시판에 접근 권한이 없습니다.');
     }
 
-    return new FindPostResponseDto().of(post);
+    return {
+      post: new FindPostResponseDto().of(post),
+      type: postCategory.id,
+    };
   }
 
   async update(

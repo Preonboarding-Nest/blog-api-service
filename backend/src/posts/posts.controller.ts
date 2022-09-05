@@ -87,7 +87,13 @@ export class PostsController {
     @Param('id', ParseIntPipe) postId: number,
     @Param('categoryId', ParseIntPipe) categoryId: number,
   ): Promise<FindPostResponseDto> {
-    return await this.postsService.findOne(currentUserId, postId, categoryId);
+    const result = await this.postsService.findOne(
+      currentUserId,
+      postId,
+      categoryId,
+    );
+    this.emitPostStatisticsEvent(API_METHOD.GET, currentUserId, result.type);
+    return result.post;
   }
 
   @ApiOperation({ summary: '게시글 수정 API' })
