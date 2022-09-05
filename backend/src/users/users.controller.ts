@@ -3,13 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   ParseIntPipe,
   UseGuards,
   UnauthorizedException,
-  Redirect,
   Res,
   ForbiddenException,
 } from '@nestjs/common';
@@ -25,24 +23,44 @@ import { User } from './entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { GetCurrentUserId } from '../commons/decorators/get.current-userId.decorator';
 import { Response } from 'express';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { API_METHOD, API_RESOURCE, EVENTS } from '../commons/constants';
+import { StatisticsSaveEvent } from '../statistics/events/statistics-save.event';
 
 @Controller('users')
 @ApiTags('Users API')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: '유저 생성 API', description: '유저를 생성합니다.' })
   @ApiCreatedResponse({ description: '유저를 생성합니다.', type: User })
-  createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.usersService.createUser(createUserDto);
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    const user = await this.usersService.createUser(createUserDto);
+
+    this.eventEmitter.emit(
+      EVENTS.STATISTICS_SAVE,
+      new StatisticsSaveEvent(API_RESOURCE.USER._, API_METHOD.POST, user.id),
+    );
+
+    return user;
   }
 
   @Get(':id')
   @ApiOperation({ summary: '유저 조회 API', description: '유저를 조회합니다.' })
   @ApiCreatedResponse({ description: '유저를 조회합니다.', type: User })
-  findOneUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.usersService.findUserById(id);
+  async findOneUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    const user = await this.usersService.findUserById(id);
+
+    this.eventEmitter.emit(
+      EVENTS.STATISTICS_SAVE,
+      new StatisticsSaveEvent(API_RESOURCE.USER._, API_METHOD.GET, user.id),
+    );
+
+    return user;
   }
 
   @Delete(':id')
@@ -51,7 +69,7 @@ export class UsersController {
   @ApiCookieAuth('refreshToken')
   @ApiCookieAuth('accessToken')
   @UseGuards(AuthGuard('jwt'))
-  removeUserById(
+  async removeUserById(
     @Param('id', ParseIntPipe) id: number,
     @GetCurrentUserId() currentUserId: number,
     @Res({ passthrough: true }) res: Response,
@@ -67,6 +85,17 @@ export class UsersController {
       throw new ForbiddenException('Cookie access 실패');
     }
 
-    return this.usersService.removeUserById(id);
+    await this.usersService.removeUserById(id);
+
+    this.eventEmitter.emit(
+      EVENTS.STATISTICS_SAVE,
+      new StatisticsSaveEvent(
+        API_RESOURCE.USER._,
+        API_METHOD.DELETE,
+        currentUserId,
+      ),
+    );
+
+    return;
   }
 }
