@@ -22,7 +22,11 @@ export class AuthService {
     private readonly redisService: RedisService,
   ) {}
 
+  /** User email로 User를 조회 */
   async findUserByEmail(email: string): Promise<User> {
+    /**
+     * @param email User email
+     */
     try {
       const user: User = await this.userRepository.findOne({
         where: { email },
@@ -33,7 +37,11 @@ export class AuthService {
     }
   }
 
+  /** User id로 User를 조회 */
   async findUserById(id: number): Promise<User> {
+    /**
+     * @param id User id
+     */
     try {
       const user: User = await this.userRepository.findOne({
         where: { id },
@@ -44,7 +52,11 @@ export class AuthService {
     }
   }
 
+  /** User의 refresh token과 access token을 발행하여 redis에 저장 */
   async login(loginDto: LoginDto) {
+    /**
+     * @param loginDto user email, User password
+     */
     const { email, password } = loginDto;
     const user: User = await this.findUserByEmail(email);
     if (!user || user.isDeleted)
@@ -65,7 +77,12 @@ export class AuthService {
     return { user, tokens };
   }
 
+  /** User의 refresh token과 access token을 발행*/
   async makeTokens(email: string, id: number): Promise<Tokens> {
+    /**
+     * @param email user email
+     * @param id user id
+     */
     try {
       const jwtPayload: JwtPayload = { email, sub: id };
 
@@ -85,12 +102,20 @@ export class AuthService {
     }
   }
 
+  /** User의 refresh token과 access token을 redis에서 삭제*/
   async logout(id: number): Promise<boolean> {
+    /**
+     * @param id user id
+     */
     await this.redisService.delKey('refresh' + id.toString());
     return true;
   }
 
+  /** User의 refresh token을 redis에서 조회하고 새로운 access token을 발행*/
   async token(id: number): Promise<string> {
+    /**
+     * @param id user id
+     */
     const refreshToken: string = await this.redisService.getKey(
       'refresh' + id.toString(),
     );
