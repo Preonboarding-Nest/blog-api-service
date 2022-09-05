@@ -7,19 +7,22 @@ import {
   Logger,
   Post,
   Res,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBody,
   ApiCookieAuth,
   ApiOperation,
   ApiResponse,
-  ApiTags,
+  ApiTags
 } from '@nestjs/swagger';
 import { Response } from 'express';
+import { API_METHOD, API_RESOURCE, EVENTS } from '../commons/constants';
 import { GetCurrentUserId } from '../commons/decorators';
+import { StatisticsSaveEvent } from '../statistics/events/statistics-save.event';
 import { AuthService } from './auth.service';
 import { LoginDto, LoginResponseDto } from './dto';
 
@@ -30,6 +33,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @HttpCode(201)
@@ -65,6 +69,11 @@ export class AuthController {
     } catch (error) {
       throw new ForbiddenException('cookie access Failed!');
     }
+
+    this.eventEmitter.emit(
+      EVENTS.STATISTICS_SAVE,
+      new StatisticsSaveEvent(API_RESOURCE.USER._, API_METHOD.POST),
+    );
 
     this.logger.verbose(`login success!`);
     return {
@@ -106,6 +115,11 @@ export class AuthController {
     } catch (error) {
       throw new ForbiddenException('cookie access Failed!');
     }
+
+    this.eventEmitter.emit(
+      EVENTS.STATISTICS_SAVE,
+      new StatisticsSaveEvent(API_RESOURCE.USER._, API_METHOD.POST, id),
+    );
   }
 
   @HttpCode(200)
@@ -134,5 +148,10 @@ export class AuthController {
     } catch (error) {
       throw new ForbiddenException('cookie access Failed!');
     }
+
+    this.eventEmitter.emit(
+      EVENTS.STATISTICS_SAVE,
+      new StatisticsSaveEvent(API_RESOURCE.USER._, API_METHOD.GET, id),
+    );
   }
 }
