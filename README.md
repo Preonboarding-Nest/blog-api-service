@@ -20,7 +20,7 @@
 
 
 # 요구사항 분석  
-[](https://github.com/Preonboarding-Nest/blog-api-service/files/9486215/default.pdf)
+[요구사하 원문](https://github.com/Preonboarding-Nest/blog-api-service/files/9486215/default.pdf)
 
 ## 1. 회원 생성/조회/수정/삭제  
   
