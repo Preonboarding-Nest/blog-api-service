@@ -14,7 +14,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, CreateUserResponseDto } from './dto/create-user.dto';
 import {
   ApiCookieAuth,
   ApiCreatedResponse,
@@ -25,6 +25,7 @@ import { User } from './entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { GetCurrentUserId } from '../commons/decorators/get.current-userId.decorator';
 import { Response } from 'express';
+import { Serialize } from '../interceptors/serialize.interceptor';
 
 @Controller('users')
 @ApiTags('Users API')
@@ -32,6 +33,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @Serialize(CreateUserResponseDto)
   @ApiOperation({ summary: '유저 생성 API', description: '유저를 생성합니다.' })
   @ApiCreatedResponse({ description: '유저를 생성합니다.', type: User })
   createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -39,6 +41,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @Serialize(CreateUserResponseDto)
   @ApiOperation({ summary: '유저 조회 API', description: '유저를 조회합니다.' })
   @ApiCreatedResponse({ description: '유저를 조회합니다.', type: User })
   findOneUser(@Param('id', ParseIntPipe) id: number): Promise<User> {

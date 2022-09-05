@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
@@ -42,4 +43,21 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   phone: string;
+}
+
+export class CreateUserResponseDto {
+  @Expose()
+  id: number;
+
+  @Expose()
+  email: string;
+
+  @Expose()
+  gender: string;
+
+  @Expose()
+  phone: string;
+
+  @Expose()
+  role: string;
 }
