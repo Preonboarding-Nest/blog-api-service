@@ -91,14 +91,6 @@ swagger를 사용하여 제작한 API Docs
 
 ![모델링](https://user-images.githubusercontent.com/63445753/188299953-62432aae-8f5d-4876-8b26-0169015c05cf.png) 
 
-
-모델링 주요 이슈 
-1.
-
-2.
-
-3.
-
 ### 폴더 구조
 ```
 project/
