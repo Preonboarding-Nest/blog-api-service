@@ -61,7 +61,12 @@
     
 
 
-# 사용 예제  (api doc ?)
+# API Docs
+
+swagger를 사용하여 제작한 API Docs
+
+[👉 Swagger Docs 바로가기](https://app.swaggerhub.com/apis-docs/preonboarding/blog-api-service/1.0)
+
 ## 1. 회원 
 ### 1.1 회원 등록(POST)
 
@@ -183,10 +188,11 @@ redis:
 
 #### Auth Service
 
+![image](https://user-images.githubusercontent.com/71163016/188348898-7a25c0a7-918c-4210-95c1-8abc6a9fcfd1.png)
+
 # 서비스 배포  
 ## 배포 환경 
-// 환경 설명
 
-## 서비스 캡쳐 사진 
-// 이미지 
+> GCP Compute Engine에 docker compose를 사용해 배포하였습니다.
 
+👉 http://34.64.203.1:4000/
