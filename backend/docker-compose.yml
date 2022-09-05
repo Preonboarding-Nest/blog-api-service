@@ -1,0 +1,26 @@
+version: '3'
+services:
+  redis:
+    image: redis:alpine
+    container_name: wanted_redis
+    ports:
+      - 6379:6379
+    restart: unless-stopped
+    command: redis-server /usr/local/conf/redis.conf
+    volumes:
+      - ./data/:/data
+      - ./conf/redis.conf:/usr/local/conf/redis.conf
+    networks:
+      - wanted_networks
+  backend:
+    image: ghcr.io/preonboarding-nest/wanted_waynehills:latest
+    ports:
+      - 4000:4000
+    depends_on:
+      - redis
+    restart: 'on-failure'
+    networks:
+      - wanted_networks
+networks:
+  wanted_networks:
+    driver: bridge
