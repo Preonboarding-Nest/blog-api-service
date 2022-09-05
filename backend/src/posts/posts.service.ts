@@ -33,10 +33,16 @@ export class PostsService {
    * 운영 게시판: (운영자 CRUD)
    */
 
+  /**
+   * 게시글을 등록
+   * @param currentUserId 현재 로그인한 사용자의 id
+   * @param createPostDto 게시글 등록용 DTO
+   * @returns 등록된 게시글의 id와 게시글 type
+   */
   async create(
     currentUserId: number,
     createPostDto: CreatePostDto,
-  ): Promise<number> {
+  ): Promise<{ id: number; type: number }> {
     const post = new Post();
     const categoryId = createPostDto.categoryId;
     const currentUser = await this.userRepository.findOne({
@@ -72,13 +78,22 @@ export class PostsService {
     post.user = currentUser;
 
     const savedPost = await this.postRepository.save(post);
-    return savedPost.id;
+    return {
+      id: savedPost.id,
+      type: savedPost.postCategory.id,
+    };
   }
 
+  /**
+   * 게시글 목록 조회
+   * @param currentUserId 현재 로그인한 사용자의 id
+   * @param categoryId 조회할 게시글 종류 id
+   * @returns 게시글 상세 배열 DTO
+   */
   async findAll(
     currentUserId: number,
     categoryId: number,
-  ): Promise<FindPostResponseDto[]> {
+  ): Promise<{ posts: FindPostResponseDto[]; type: number }> {
     const currentUser = await this.userRepository.findOne({
       where: { id: currentUserId, isDeleted: false },
     });
@@ -104,14 +119,24 @@ export class PostsService {
       relations: ['user'],
     });
 
-    return posts.map((p) => new FindPostResponseDto().of(p));
+    return {
+      posts: posts.map((p) => new FindPostResponseDto().of(p)),
+      type: postCategory.id,
+    };
   }
 
+  /**
+   * 게시글 상세 조회
+   * @param currentUserId 현재 로그인한 사용자의 id
+   * @param postId 조회할 게시글 상세 id
+   * @param categoryId 조회할 게시글 종류 id
+   * @returns 게시글 상세 DTO
+   */
   async findOne(
     currentUserId: number,
     postId: number,
     categoryId: number,
-  ): Promise<FindPostResponseDto> {
+  ): Promise<{ post: FindPostResponseDto; type: number }> {
     const currentUser = await this.userRepository.findOne({
       where: { id: currentUserId, isDeleted: false },
     });
@@ -140,9 +165,18 @@ export class PostsService {
       throw new ForbiddenException('운영 게시판에 접근 권한이 없습니다.');
     }
 
-    return new FindPostResponseDto().of(post);
+    return {
+      post: new FindPostResponseDto().of(post),
+      type: postCategory.id,
+    };
   }
 
+  /**
+   * 게시글 수정
+   * @param currentUserId 현재 로그인한 사용자의 id
+   * @param postId 수정할 게시글 상세 id
+   * @param updatePostDto 수정할 내용을 담고있는 DTO
+   */
   async update(
     currentUserId: number,
     postId: number,
@@ -171,6 +205,11 @@ export class PostsService {
     await this.postRepository.update(postId, { title, content });
   }
 
+  /**
+   * 게시글 삭제
+   * @param currentUserId 현재 로그인한 사용자의 id
+   * @param postId 삭제할 게시글 상세 id
+   */
   async remove(currentUserId: number, postId: number): Promise<void> {
     const currentUser = await this.userRepository.findOne({
       where: { id: currentUserId, isDeleted: false },
