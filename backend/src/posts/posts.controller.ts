@@ -111,6 +111,7 @@ export class PostsController {
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<void> {
     await this.postsService.update(currentUserId, postId, updatePostDto);
+    this.emitPostStatisticsEvent(API_METHOD.PATCH, currentUserId, null);
   }
 
   @ApiOperation({ summary: '게시글 삭제 API' })
@@ -126,17 +127,24 @@ export class PostsController {
     @GetCurrentUserId() currentUserId: number,
     @Param('id', ParseIntPipe) postId: number,
   ): Promise<void> {
-    return await this.postsService.remove(currentUserId, postId);
+    await this.postsService.remove(currentUserId, postId);
+    this.emitPostStatisticsEvent(API_METHOD.DELETE, currentUserId, null);
   }
 
-  emitPostStatisticsEvent(method, currentUserId, postType) {
-    let resource;
+  emitPostStatisticsEvent(
+    method: string,
+    currentUserId: number,
+    postType: number | null,
+  ) {
+    let resource: string;
     if (postType === POST_TYPE_ENUM.FREE) {
       resource = API_RESOURCE.POST._FREE;
     } else if (postType === POST_TYPE_ENUM.NOTICE) {
       resource = API_RESOURCE.POST._NOTICE;
     } else if (postType === POST_TYPE_ENUM.PROD) {
       resource = API_RESOURCE.POST._OPERATE;
+    } else {
+      resource = API_RESOURCE.POST._;
     }
 
     this.eventEmitter.emit(
