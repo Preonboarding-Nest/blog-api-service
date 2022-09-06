@@ -2,7 +2,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiCookieAuth,
-  ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiQuery,
   ApiTags,
@@ -11,6 +11,7 @@ import { GENDER_ENUM, ROLE_ENUM } from '../users/entities/enums';
 import { GetCurrentUserId } from '../commons/decorators';
 import { StatisticsService } from './statistics.service';
 import { TERM_ENUM } from '../commons/enums/commons.enums';
+import { FindStatisticResults } from './dto/find-statistics.dto';
 
 @ApiTags('Statistics API')
 @Controller('statistics')
@@ -21,7 +22,11 @@ export class StatisticsController {
     summary: '통계 조회 API',
     description: '통계 정보를 조회합니다.',
   })
-  @ApiCreatedResponse({ description: '통계 정보를 조회합니다.' })
+  @ApiOkResponse({
+    status: 200,
+    description: '통계 정보를 조회합니다.',
+    type: FindStatisticResults,
+  })
   @ApiQuery({
     name: 'from',
     description: '조회 시작 날짜를 나타냅니다. (yyyy-mm-dd)',
@@ -63,15 +68,17 @@ export class StatisticsController {
     description: '조회하고자 하는 사용자 권한을 나타냅니다.',
   })
   @ApiQuery({
-    name: 'term_unit',
+    name: 'term',
+    enum: TERM_ENUM,
+    enumName: 'TERM',
     required: false,
-    description: '조회하고자 통계 시간 단위 값을 나타냅니다.',
+    description: '조회하고자 통계 시간 단위을 나타냅니다.(월, 일, 시간, 분)',
   })
   @ApiQuery({
-    name: 'term',
+    name: 'term_unit',
     required: false,
     description:
-      '조회하고자 통계 시간 단위을 나타냅니다.(년, 월, 일, 시간, 분, 초)',
+      '조회하고자 통계 시간 단위 값을 나타냅니다. term에 따라 사용 가능한 값이 다릅니다. (월(1,2,3,4,6) / 일(1,7,14) / 시간(1,2,3,4,6,8,12) / 분(1,2,3,4,5,6,10,12,15,20,30)',
   })
   @UseGuards(AuthGuard('jwt'))
   @ApiCookieAuth('accessToken')
@@ -85,11 +92,11 @@ export class StatisticsController {
     @Query('age_from') ageFrom: string,
     @Query('age_to') ageTo: string,
     @Query('user_role') userRole: ROLE_ENUM,
-    @Query('term_unit') termUnit: string,
     @Query('term') term: TERM_ENUM,
+    @Query('term_unit') termUnit: string,
     @GetCurrentUserId() currentUserId: number,
-  ) {
-    return await this.statisticsService.find({
+  ): Promise<FindStatisticResults> {
+    const results = await this.statisticsService.find({
       from,
       to,
       resource,
@@ -98,9 +105,13 @@ export class StatisticsController {
       ageFrom,
       ageTo,
       userRole,
-      termUnit,
       term,
+      termUnit,
       currentUserId,
     });
+
+    return {
+      results,
+    };
   }
 }
