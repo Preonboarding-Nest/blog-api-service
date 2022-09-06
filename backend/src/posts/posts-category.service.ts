@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -31,11 +30,16 @@ export class PostsCategoryService {
 
     const postCategory = await this.postCategoryRepository.create({ type });
 
-    return await this.postCategoryRepository.save(postCategory);
+    const retrievedCategory = await this.postCategoryRepository.save(
+      postCategory,
+    );
+
+    return retrievedCategory;
   }
 
   async findAllPostCategories(): Promise<PostCategory[]> {
     const postCategories = await this.postCategoryRepository.find();
+
     return postCategories;
   }
 
