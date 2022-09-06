@@ -12,12 +12,13 @@ export enum POST_TYPE_ENUM {
 /**
  * 정리
  * 년 월 일 시 분 초
+ *
+ * loading 이슈로 초 단위는 주석처리
  */
 export enum TERM_ENUM {
-  YEAR = 'year',
   MONTH = 'month',
   DATE = 'date',
   HOUR = 'hour',
   MIN = 'min',
-  SEC = 'sec',
+  // SEC = 'sec',
 }
